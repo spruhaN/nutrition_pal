@@ -1,4 +1,5 @@
 # 365-group-project (name is TBD)
-Group Members: Baylor Pond, Jonathan DeBarro, and Spruha Nayak
+Group Members: Baylor Pond, Jonathan DeBarro, Arthur Umerov, and Spruha Nayak(spnayak@calpoly.edu)
 
-
+Proposal: 
+Nutrient Pal is a way to track macros and calories. Given certain details of the user and their goals, Nutrient Pal should be able to suggest missing macos and reminders so that the user gets closer to the their goals. Nutrient Pal can even suggest certain kinds of meals based on the user's daily intake.
