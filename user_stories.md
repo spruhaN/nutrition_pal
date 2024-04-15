@@ -1,16 +1,27 @@
 # User Stories
 As someone who cooks food a lot, I want to see the nutritional contents of certain types of food so that I can know what amounts of protein, sugars, fats, etc. are in the food I make.
+
 As an athlete, I want to know how many calories are in the food I eat so that I can make sure I am getting enough calories each day.
+
 As someone who is trying to lose weight, I want to know how many calories and fats are in the food I eat so I can make sure I am not eating too much food.
+
 As someone who likes to try new foods, I want to be able to sort through different foods based on certain criteria so that I can discover new things to try.
+
 As someone who likes to bake, I want to be able to see the nutritional content of the ingredients I use so that I know what is in the baked goods.
+
 As someone interested in nutrition, I want to be able to explore a database of foods with nutrition facts so that I can learn more about what kinds of foods have certain nutritional contents.
+
 As someone who is lactose intolerant, I want to find lactose free foods that are also high in protein so that I can still reach my daily nutritional goals.
+
 As someone who is allergic to nuts, I want to find healthy snack alternatives that have fats and proteins that I am lacking so that I can meet my nutritional goals.
+
 As someone who has celiac’s disease, I want to find calorie dense foods that do not contain gluten so that I can still get enough calories in a day without bread or wheat products.
 As someone with diabetes, I want to be aware of how much sugar is in my food so that I can maintain my blood sugar levels.
+
 As someone who has a fast metabolism and struggles to eat a lot, I want to find calorie dense foods so that I can meet my calorie intake goals.
+
 As someone looking to build a lot of muscle, I want to find protein dense foods so that I can build as much muscle as possible
+
 
 # Exceptions
 Exception: Food item not found.
