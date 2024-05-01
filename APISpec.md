@@ -140,8 +140,8 @@ Sees what muscle group a workout hits, supplies the id
     }
 ```
 
-### 1.8. Search workout muscle groups - `/workout/muscle_groups/{type}` (GET)
-See workout for a specific muscle group
+### 1.8. Search workouts by muscle groups - `/workout/muscle_groups/{type}` (GET)
+See workout for a specific muscle group, this is from a db of generic wrokouts separate from personal workouts
 
 **Response**:
 
@@ -154,15 +154,18 @@ See workout for a specific muscle group
 ```
 
 
-### 1.9. Search workout muscle groups for workouts youve done - `/workout/{id}/muscle_groups/{type}` (GET)
-See workout for a specific muscle group that you have done before
-
+### 1.9. See workout you've done for that type - `/workout/personal/muscle_groups/{type}` (GET)
+Returns a list of workouts you have done that correpsond to the type you set
 **Response**:
 
 ```json
 [
     {
-      "name" : "string"
+        "name": "string", /* May have restricted workout where the only options are like pushup, pull-up, cardio atm*/
+        "sets": "integer",
+        "reps": "integer",
+        "length": "integer", /* minutes */
+        "date" : "timeday"
     }
 ]
 ```

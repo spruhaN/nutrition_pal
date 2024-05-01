@@ -14,7 +14,7 @@ Marc enters his goals by calling POST /goals passing “get big”, “workout�
 He then begins adding workouts with with POST /workout passing “push-up”, 3, 10, 14.
 He does this with multiple workouts at varying lengths, set, reps.
 His friends asks him what workouts he’s done, so he GET /workouts/days and returns a list of workout with “id”, “name”, “sets”, “reps”, “length”, and “time”
-His friend asks to do for back, GET /workout/muscle_group/{type} passing “back” as type and returns a list of workouts “id”, “name”, “sets”, “reps”, “length”, and “time”, for the back
+His friend asks what to do for back, GET /workout/muscle_group/{type} passing “back” as type and returns a list of workouts “id”, “name”, “sets”, “reps”, “length”, and “time”, for the back
 
 # Flow 3. Finding workout muscle_groups
 Andrew M. is jealous of his roommate’s incredible physique. 
