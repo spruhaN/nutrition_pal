@@ -104,7 +104,7 @@ Get all meals eaten
         "id": "integer",
         "type": "string", 
         "calories": "integer",
-        "date": "timeday
+        "date": "timeday"
     }
 ]
 ```
