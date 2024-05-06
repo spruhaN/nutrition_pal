@@ -11,6 +11,7 @@
 10. As someone with diabetes, I want to be aware of how much sugar is in my food so that I can maintain my blood sugar levels.
 11. As someone who has a fast metabolism and struggles to eat a lot, I want to find calorie dense foods so that I can meet my calorie intake goals.
 12. As someone looking to build a lot of muscle, I want to find protein dense foods so that I can build as much muscle as possible
+13. As someone who is curious about their consumption, I want to be able to log my meals so I can view them whenever I want
 
 
 # Exceptions
