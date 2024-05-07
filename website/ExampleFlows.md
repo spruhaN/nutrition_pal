@@ -1,11 +1,12 @@
 # Flow 1. Tracking daily calories and inputting workouts
 Stephanie has some goals and wants to start tracking her calories and meals. <br />
-First she POST /goals passing “lose weight”, “diet” and 2000<br />
-Next she eats food and does a POST /meal passing “Mexican” and 800.<br />
-She wants to see how many calories she has left GET /daily_calories returning 1200.<br />
-She then eats a pizza, POSTS /meal passing “Italian” 1200. <br />
-Checks calories with GET /daily_calories, returns 0. <br />
-Next day GET /meal/day returning a list of meals with an id, type, calorie, and time stamp<br />
+First she does a POST /user name ,weight height, "Stephanie", 100, 100, gets her id as a return
+Then she POST /goals{id} passing “lose weight”, “diet” and 2000<br />
+Next she eats food and does a POST /meal{id} passing “Mexican” and 800.<br />
+She wants to see how many calories she has left GET /daily_calories{id} returning 1200.<br />
+She then eats a pizza, POSTS /meal{id} passing “Italian” 1200. <br />
+Checks calories with GET /daily_calories{id}, returns 0. <br />
+Next day GET /meal{id}/day returning a list of meals with an id, type, calorie, and time stamp<br />
 
 
 # Flow 2. Adding and looking up workout
