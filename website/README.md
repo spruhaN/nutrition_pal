@@ -1,4 +1,4 @@
-# 365-group-project (name is TBD)
+# Nutrient-Pal
 #### Group Members: 
 Baylor Pond (bpond@calpoly.edu), Jonathan DeBarro (jdebarro@calpoly.edu), Arthur Umerov (aumerov@calpoly.edu), and Spruha Nayak(spnayak@calpoly.edu)
 
