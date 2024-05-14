@@ -1,0 +1,15 @@
+muscle_group_id,type,group
+2,back,lats
+3,back,traps
+8,arms,tricep
+1,arms,bicep
+9,arms,forearm
+4,back,rhomboid
+10,front,chest
+11,front,abs
+12,back,lower_back
+14,legs,quads
+13,legs,hamstrings
+15,legs,glutes
+16,legs,calves
+7,arms,shoulders
