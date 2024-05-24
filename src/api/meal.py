@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
 from src import database as db
@@ -19,6 +19,10 @@ class Meal(BaseModel):
 # Customer uploades meal onto db
 @router.post("/meal/{customer_id}")
 async def postMeal(meal: Meal, customer_id: int):
+
+    if meal.calories < 1:
+        raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
+    
     with db.engine.begin() as connection:
         sql = "INSERT INTO meal (name, calories, customer_id, ingredient_id)\
             VALUES (:name, :calories, :customer_id, :ingredient_id)"

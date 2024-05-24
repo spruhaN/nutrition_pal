@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
 from src import database as db
@@ -19,6 +19,9 @@ class Goal(BaseModel):
 # set goals to goal db with attached user id
 @router.post("/{customer_id}")
 async def postGoals(goal: Goal, customer_id: int):
+    if goal.daily_calories < 1:
+        raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
+    
     with db.engine.begin() as connection:
         sql = """
         INSERT INTO goals (type, goal, customer_id, daily_calories)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from src.api import auth
 from src import database as db
@@ -13,12 +13,15 @@ router = APIRouter(
 
 class User(BaseModel):
     name: str
-    weight: int
-    height: int
+    weight: int #pounds
+    height: int #inches
 
 # add user to user db and return user id
 @router.post("/")
 async def postUser(user: User):
+    if user.weight < 1 or user.weight < 1:
+        raise HTTPException(status_code=422, detail="Cannot input 0 weight or height")
+
     with db.engine.begin() as connection:
         sql = """
         INSERT INTO customer (name, weight, height)

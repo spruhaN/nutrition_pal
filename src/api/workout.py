@@ -21,7 +21,7 @@ class Workout(BaseModel):
 @router.post("/{customer_id}")
 async def postWorkout(workout: Workout, customer_id: int):
     
-    if (Workout.sets < 1) or (Workout.reps < 1) or (Workout.length < 1):
+    if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
             raise HTTPException(status_code=422, detail="Cannot input sets, reps, or length values <0")
     
     with db.engine.begin() as connection:
