@@ -60,7 +60,7 @@ async def getWorkoutsByDay(customer_id: int):
 
 # returns a list of workouts that target the given type
 @router.get("/muscle_groups/{type}")
-async def getWorkoutsByDay(type: str):
+async def getMuscleGroups(type: str):
     with db.engine.begin() as connection:
         sql = """
                 select
