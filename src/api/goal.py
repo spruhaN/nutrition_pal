@@ -34,3 +34,18 @@ async def postGoals(goal: Goal, customer_id: int):
     except:
         print("User already has goal, edit it with PUT request")
         return "Cannot have multiple goals"
+    
+
+# Updates goal information
+@router.put("/{customer_id}")
+async def updateGoal(goal: Goal, customer_id: int):
+    if goal.daily_calories < 1:
+        raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
+    
+    with db.engine.begin() as connection:
+        sql = """
+        UPDATE goals SET type = :type, goal = :goal, daily_calories = :daily_calories
+        WHERE customer_id = :customer_id
+        """
+        result = connection.execute(sqlalchemy.text(sql), goal.dict() | {"customer_id": customer_id})
+    return {"status": "OK", "message" : "Successful update"}
