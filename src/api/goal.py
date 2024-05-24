@@ -22,10 +22,15 @@ async def postGoals(goal: Goal, customer_id: int):
     if goal.daily_calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
     
-    with db.engine.begin() as connection:
-        sql = """
-        INSERT INTO goals (type, goal, customer_id, daily_calories)
-        VALUES (:type, :goal, :customer_id, :daily_calories)
-        """
-        connection.execute(sqlalchemy.text(sql), goal.dict() | {"customer_id": customer_id})
-    return "OK"
+    try:
+        with db.engine.begin() as connection:
+            sql = """
+            INSERT INTO goals (type, goal, customer_id, daily_calories)
+            VALUES (:type, :goal, :customer_id, :daily_calories)
+            """
+            connection.execute(sqlalchemy.text(sql), goal.dict() | {"customer_id": customer_id})
+        return "OK"
+    
+    except:
+        print("User already has goal, edit it with PUT request")
+        return "Cannot have multiple goals"
