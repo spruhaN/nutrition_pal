@@ -28,3 +28,30 @@ async def getDailyCalories(customer_id: int):
         
         calories_left = daily_calories[0] - calories
     return {"calories_left" : calories_left}
+
+
+# Customer gets an average calorie intake over the last x days as well as their most caloric meal
+@router.get("{customer_id}/average")
+async def getAverageMeals(customer_id: int, over_days: int):
+    with db.engine.begin() as connection:
+        sql = """
+                SELECT name, calories
+                FROM meal
+                WHERE customer_id = :customer_id AND DATEDIFF(DATE('now'),DATE(time))<:range
+                ORDER BY calories
+            """
+        calories = connection.execute(sqlalchemy.text(sql), [{"customer_id":customer_id, "range":over_days}]).fetchall()
+
+        calorie_total = 0
+        biggest_meal = ""
+        i = 0
+        for cal in calories:
+            if i == 0:
+                biggest_meal = cal[0]
+            calorie_total+=cal[1]
+            i+=1
+        calorie_avg = calorie_total/over_days
+        return {
+            "biggest meal": biggest_meal,
+            "average calories": calorie_avg
+        }

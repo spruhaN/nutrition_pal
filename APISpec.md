@@ -55,11 +55,19 @@ Writes a goal to the db so the person can see what they committed to
 ```
 
 
-### 1.3. Daily Calories Needed - `/daily_calories/` (GET)
+### 1.3. Daily Calories Needed - `/daily_calories/{customer_id}/` (GET)
 
 Get's how many calories you need to meet your daily goal
 
-**Respone**:
+**Request**:
+
+```json
+{
+  "customer_id": "integer"
+}
+```
+
+**Response**:
 
 ```json
 {
@@ -67,9 +75,31 @@ Get's how many calories you need to meet your daily goal
 }
 ```
 
+### 1.4. Average Daily Calories - `/daily_calories/{customer_id}/average` (GET)
+
+Gets how many average calories a user has consumed over the last x days along with their biggest meal
+
+**Request**:
+
+```json
+{
+  "customer_id": "integer",
+  "over_days": "integer"
+}
+```
+
+**Response**:
+
+```json
+{
+  "biggest_meal": "string",
+  "average_calories": "integer"
+}
+```
 
 
-### 1.4. Post Workout - `/workout/` (POST)
+
+### 1.5. Post Workout - `/workout/` (POST)
 
 Posts a workout to the db, ID of muscle groups can be assigned by the db
 
@@ -92,7 +122,7 @@ Posts a workout to the db, ID of muscle groups can be assigned by the db
 }
 ```
 
-### 1.5. Get meals eaten - `/meal/day` (GET)
+### 1.6. Get meals eaten - `/meal/day` (GET)
 
 Get all meals eaten
 
@@ -109,7 +139,7 @@ Get all meals eaten
 ]
 ```
 
-### 1.6. Get all workouts - `/workout/day` (GET)
+### 1.7. Get all workouts - `/workout/day` (GET)
 
 Get all meals eaten
 
@@ -128,7 +158,7 @@ Get all meals eaten
 ]
 ```
 
-### 1.7. See what muscle group a workout hits - `/workout/{id}/muscle_groups` (GET)
+### 1.8. See what muscle group a workout hits - `/workout/{id}/muscle_groups` (GET)
 Sees what muscle group a workout hits, supplies the id
 
 **Response**:
@@ -140,7 +170,7 @@ Sees what muscle group a workout hits, supplies the id
     }
 ```
 
-### 1.8. Search workouts by muscle groups - `/workout/muscle_groups/{type}` (GET)
+### 1.9. Search workouts by muscle groups - `/workout/muscle_groups/{type}` (GET)
 See workout for a specific muscle group, this is from a db of generic wrokouts separate from personal workouts
 
 **Response**:
@@ -154,7 +184,7 @@ See workout for a specific muscle group, this is from a db of generic wrokouts s
 ```
 
 
-### 1.9. See workout you've done for that type - `/workout/personal/muscle_groups/{type}` (GET)
+### 1.10. See workout you've done for that type - `/workout/personal/muscle_groups/{type}` (GET)
 Returns a list of workouts you have done that correpsond to the type you set
 **Response**:
 
