@@ -27,5 +27,5 @@ async def postUser(user: User):
         INSERT INTO customer (name, weight, height)
         VALUES (:name, :weight, :height) RETURNING customer_id
         """
-        result = connection.execute(sqlalchemy.text(sql), user.dict()).fetchone()
-    return {"id": result.customer_id}
+        result = connection.execute(sqlalchemy.text(sql), user.dict()).scalar_one()
+    return {"id": result}

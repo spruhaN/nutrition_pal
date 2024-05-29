@@ -10,6 +10,27 @@
 `/workout/muscle_groups/{type}`
 `/workout/{id}/muscle_groups/{type}`
 
+
+### 1.1. POST user - `/user/` (POST)
+
+POSTS a user to the DB
+**Request**:
+
+```json
+    {
+        "name": "string", /*Mexican, Asian, Indian, whatever type*/
+        "weight": "integer", /* pounds */
+        "height" : "integer" /* inches
+    }
+```
+
+**Response**
+
+```json
+{
+    "success": "boolean"
+}
+```
 ### 1.1. POST meal - `/meal/` (POST)
 
 POSTS a meal to the db, with primary ingredient and calories

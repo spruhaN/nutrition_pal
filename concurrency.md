@@ -1,0 +1,1 @@
+Have to translate google doc contents to this, group memebr with file isn't responsive rn
