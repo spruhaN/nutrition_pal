@@ -132,7 +132,7 @@ async def recWorkout(customer_id: int, type: str):
             workouts.append({
                 "name" : workout.name,
                 "sets" : workout.sets,
-                "reps" : workouts.reps
+                "reps" : workout.reps
             })
 
     return workouts

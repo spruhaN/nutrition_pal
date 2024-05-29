@@ -70,3 +70,37 @@ async def getAllMeals(customer_id: int):
                  }
             )
     return meal_list
+
+# Gets at most 3 meals recommended to the customer based on their previous preferences and their caloric needs
+@router.get("/meal/{customer_id}/recommend")
+async def getRecommendedMeal(customer_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT daily_calories FROM goals WHERE customer_id = :customer_id"
+        daily_calories = connection.execute(sqlalchemy.text(sql), 
+                                            [{"customer_id": customer_id}]).fetchone()
+        if not daily_calories:
+            raise HTTPException(status_code=404, detail="User does not have daily_calories")
+        
+        sql = "SELECT COALESCE(SUM(calories), 0) FROM meal WHERE customer_id = :customer_id\
+            AND DATE(time) = DATE('now')"
+        calories = connection.execute(sqlalchemy.text(sql), 
+                                            [{"customer_id": customer_id}]).fetchone()[0]
+        
+        calories_left = daily_calories[0] - calories
+        newsql = "SELECT name, calories, (CASE WHEN (customer_id = :customer_id) THEN rating*2 ELSE rating END) as rated\
+                    FROM meal\
+                    WHERE calories<:calories_left AND ((time <= CURRENT_DATE - 2 AND customer_id = :customer_id) OR customer_id != :customer_id)\
+                    ORDER BY rated DESC\
+                    LIMIT 3"
+        meals = connection.execute(sqlalchemy.text(newsql),
+                                        [{"customer_id": customer_id, "calories_left": calories_left}]).fetchall()
+        if not meals:
+            raise HTTPException(status_code=404, detail="No prior meals in the database to recommend from")
+        
+        mealrecs = []
+        for meal in meals:
+            mealrecs.append({
+                "meal name" : meal.name,
+                "calories" : calories.sets,
+            })
+    return mealrecs
