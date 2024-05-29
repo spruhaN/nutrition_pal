@@ -109,14 +109,6 @@ Gets how many average calories a user has consumed over the last x days along wi
 }
 ```
 
-**Response**:
-
-```json
-{
-  "biggest_meal": "string",
-  "average_calories": "integer"
-}
-```
 
 
 

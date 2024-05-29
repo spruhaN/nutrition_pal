@@ -38,14 +38,14 @@ async def postWorkout(workout: Workout, customer_id: int):
                     INSERT INTO customer_workouts (exercise_id, sets, reps, length, customer_id)
                     VALUES (:e_id, :sets, :reps, :length, :customer_id)
                     """
-        result = connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "customer_id": customer_id})
+        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "customer_id": customer_id})
     return "OK"
 
 @router.get("/{customer_id}/day")
 async def getWorkoutsByDay(customer_id: int):
     with db.engine.begin() as connection:
         sql = """
-                select
+                SELECT
                     e.id,
                     e.name,
                     mg.type,
@@ -53,10 +53,10 @@ async def getWorkoutsByDay(customer_id: int):
                     cw.sets,
                     cw.reps,
                     cw.length
-                from customer_workouts as cw
-                join exercises as e on cw.exercise_id = e.id
-                join muscle_groups as mg on e.muscle_group_id = mg.muscle_group_id
-                where cw.customer_id = :cid and DATE(time) = DATE('now')
+                FROM customer_workouts AS cw
+                JOIN exercises AS e ON cw.exercise_id = e.id
+                JOIN muscle_groups AS mg ON e.muscle_group_id = mg.muscle_group_id
+                WHERE cw.customer_id = :cid and DATE(time) = DATE('now')
                 """
         result = connection.execute(sqlalchemy.text(sql), {"cid": customer_id}).mappings().all()
 
@@ -67,13 +67,13 @@ async def getWorkoutsByDay(customer_id: int):
 async def getMuscleGroups(type: str):
     with db.engine.begin() as connection:
         sql = """
-                select
+                SELECT
                     e.name,
                     mg.type,
                     mg.group
-                from exercises as e
-                join muscle_groups as mg on mg.muscle_group_id = e.muscle_group_id
-                where mg.type = :m_type
+                FROM exercises AS e
+                JOIN muscle_groups AS mg ON mg.muscle_group_id = e.muscle_group_id
+                WHERE mg.type = :m_type
                 """
         result = connection.execute(sqlalchemy.text(sql), {"m_type": type}).mappings().all()
     return result
@@ -84,13 +84,13 @@ async def getMuscleGroups(type: str):
 async def getWorkoutMuscleGroups(workout_id: int):
     with db.engine.begin() as connection:
         sql = """
-                select
+                SELECT
                 e.name,
                 mg.type,
                 mg.group
-                from exercises as e
-                join muscle_groups as mg on mg.muscle_group_id = e.muscle_group_id
-                where e.id = :w_id
+                FROM exercises AS e
+                JOIN muscle_groups AS mg ON mg.muscle_group_id = e.muscle_group_id
+                WHERE e.id = :w_id
                 """
         muscle_groups = connection.execute(sqlalchemy.text(sql), {"w_id": workout_id}).mappings().all()
     return muscle_groups
@@ -101,25 +101,25 @@ async def getWorkoutMuscleGroups(workout_id: int):
 async def recWorkout(customer_id: int, type: str):
     with db.engine.begin() as connection:
         sql = "WITH recent AS (\
-                    select\
+                    SELECT\
                         exercise_id\
-                    from customer_workouts\
-                    where \
-                        customer_id = :customer_id and\
+                    FROM customer_workouts\
+                    WHERE \
+                        customer_id = :customer_id AND\
                         time >= CURRENT_DATE - 3\)\
-                select\
+                SELECT\
                     e.name AS name,\
                     ROUND(AVG(c.sets)) AS sets,\
                     ROUND(AVG(c.reps)) AS reps\
-                from exercises AS e\
-                join\
+                FROM exercises AS e\
+                JOIN\
                     customer_workouts AS c ON c.exercise_id = e.id\
-                join \
+                JOIN \
                     muscle_groups AS m ON m.muscle_group_id = e.muscle_group_id\
-                where\
-                    m.type = :type and\
+                WHERE\
+                    m.type = :type AND\
                     c.exercise_id NOT IN (SELECT exercise_id FROM recent)\
-                GROUP by e.name"
+                GROUP BY e.name"
         
         workout_list = connection.execute(sqlalchemy.text(sql), 
                                       [{"customer_id" : customer_id,
