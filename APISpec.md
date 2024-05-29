@@ -199,3 +199,30 @@ Returns a list of workouts you have done that correpsond to the type you set
     }
 ]
 ```
+
+### 1.11. See workout you've done for that type - `/meal/{customer_id}/recommend` (GET)
+Returns at most 3 meals for a customer given their caloric needs for the day
+**Response**:
+
+```json
+[
+    {
+        "meal_name": "string", 
+        "calories": "integer",
+    }
+]
+```
+
+### 1.12. See workout you've done for that type - `/workout/recommend/{customer_id}/{type}` (GET)
+Returns a list of workouts for a given type you haven't done in the past three days
+**Response**:
+
+```json
+[
+    {
+        "name": "string", 
+        "sets": "integer",
+        "reps": "integer"
+    }
+]
+```

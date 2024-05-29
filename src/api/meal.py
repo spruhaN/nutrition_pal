@@ -72,7 +72,7 @@ async def getAllMeals(customer_id: int):
     return meal_list
 
 # Gets at most 3 meals recommended to the customer based on their previous preferences and their caloric needs
-@router.get("/meal/{customer_id}/recommend")
+@router.get("/{customer_id}/recommend")
 async def getRecommendedMeal(customer_id: int):
     with db.engine.begin() as connection:
         sql = "SELECT daily_calories FROM goals WHERE customer_id = :customer_id"
@@ -100,7 +100,7 @@ async def getRecommendedMeal(customer_id: int):
         mealrecs = []
         for meal in meals:
             mealrecs.append({
-                "meal name" : meal.name,
-                "calories" : calories.sets,
+                "meal_name" : meal.name,
+                "calories" : meal.calories,
             })
     return mealrecs
