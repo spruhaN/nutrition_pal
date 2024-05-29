@@ -35,7 +35,7 @@ async def postMeal(meal: Meal, customer_id: int):
     return "OK"
 
 
-@router.app('/{customer_id}/{meal_id}')
+@router.put('/{customer_id}/{meal_id}')
 async def updateMeal(meal: Meal, customer_id: int, meal_id: int):
 
     if meal.calories < 1:
