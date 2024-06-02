@@ -58,7 +58,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
 @router.get("/{user_id}/day")
 async def getAllMeals(user_id: int):
     with db.engine.begin() as connection:
-        sql = "SELECT name, calories, time, meal_id FROM meal WHERE user_id = :user_id"
+        sql = "SELECT name, calories, type, rating, time, meal_id FROM meal WHERE user_id = :user_id"
         meals = connection.execute(sqlalchemy.text(sql), [{"user_id": user_id}]).fetchall()
 
         meal_list = []
@@ -66,8 +66,9 @@ async def getAllMeals(user_id: int):
             meal_list.append(
                 {"name": meal.name,
                  "calories": meal.calories,
-                 "time": meal.time,
                  "type": meal.type,
+                 "rating" : meal.rating,
+                 "time": meal.time,
                  "meal_id" : meal.meal_id
                  }
             )
@@ -89,7 +90,7 @@ async def getRecommendedMeal(user_id: int):
                                             [{"user_id": user_id}]).fetchone()[0]
         
         calories_left = daily_calories[0] - calories
-        newsql = "SELECT name, calories, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated\
+        newsql = "SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated\
                     FROM meal\
                     WHERE calories<:calories_left AND ((time <= CURRENT_DATE - 2 AND user_id = :user_id) OR user_id != :user_id)\
                     ORDER BY rated DESC\
@@ -104,5 +105,6 @@ async def getRecommendedMeal(user_id: int):
             mealrecs.append({
                 "meal_name" : meal.name,
                 "calories" : meal.calories,
+                "type" : meal.type
             })
     return mealrecs
