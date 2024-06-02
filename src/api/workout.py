@@ -119,26 +119,26 @@ async def getWorkoutMuscleGroups(workout_id: int):
 @router.get("/recommend/{user_id}/{type}")
 async def recWorkout(user_id: int, type: str):
     with db.engine.begin() as connection:
-        sql = "WITH recent AS (\
-                    SELECT\
-                        exercise_id\
-                    FROM user_workouts\
-                    WHERE \
-                        user_id = :user_id AND\
-                        time >= CURRENT_DATE - 3\)\
-                SELECT\
-                    e.name AS name,\
-                    ROUND(AVG(c.sets)) AS sets,\
-                    ROUND(AVG(c.reps)) AS reps\
-                FROM exercises AS e\
-                JOIN\
-                    user_workouts AS c ON c.exercise_id = e.id\
-                JOIN \
-                    muscle_groups AS m ON m.muscle_group_id = e.muscle_group_id\
-                WHERE\
-                    m.type = :type AND\
-                    c.exercise_id NOT IN (SELECT exercise_id FROM recent)\
-                GROUP BY e.name"
+        sql = """WITH recent AS (
+                    SELECT
+                        exercise_id
+                    FROM user_workouts
+                    WHERE 
+                        user_id = :user_id AND
+                        time >= CURRENT_DATE - 3)
+                SELECT
+                    e.name AS name,
+                    ROUND(AVG(c.sets)) AS sets,
+                    ROUND(AVG(c.reps)) AS reps
+                FROM exercises AS e
+                JOIN
+                    user_workouts AS c ON c.exercise_id = e.id
+                JOIN 
+                    muscle_groups AS m ON m.muscle_group_id = e.muscle_group_id
+                WHERE
+                    m.type = :type AND
+                    c.exercise_id NOT IN (SELECT exercise_id FROM recent)
+                GROUP BY e.name"""
         
         workout_list = connection.execute(sqlalchemy.text(sql), 
                                       [{"user_id" : user_id,
