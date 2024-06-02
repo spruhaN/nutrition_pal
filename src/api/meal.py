@@ -56,7 +56,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
 @router.get("/meal/{user_id}/day")
 async def getAllMeals(user_id: int):
     with db.engine.begin() as connection:
-        sql = "SELECT name, calories, time, type, meal_id FROM meal WHERE user_id = :user_id"
+        sql = "SELECT name, calories, time, meal_id FROM meal WHERE user_id = :user_id"
         meals = connection.execute(sqlalchemy.text(sql), [{"user_id": user_id}]).fetchall()
 
         meal_list = []
