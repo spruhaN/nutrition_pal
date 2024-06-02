@@ -29,7 +29,7 @@ async def postMeal(meal: Meal, user_id: int):
         sql = "INSERT INTO meal (name, calories, user_id, ingredient_id, rating, type)\
             VALUES (:name, :calories, :user_id, :ingredient_id, :rating, :type)"
         
-        result = connection.execute(sqlalchemy.text(sql), 
+        connection.execute(sqlalchemy.text(sql), 
                                     [{"name": meal.name, "calories": meal.calories, 
                                       "user_id": user_id, "ingredient_id": 1,
                                       "rating" : meal.rating, "type": meal.type}])
@@ -97,7 +97,7 @@ async def getRecommendedMeal(user_id: int):
                     LIMIT 3"
         meals = connection.execute(sqlalchemy.text(newsql),
                                         [{"user_id": user_id, "calories_left": calories_left}]).fetchall()
-        if not meals:
+        if not meals or len(meals) == 0:
             raise HTTPException(status_code=404, detail="No prior meals in the database to recommend from")
         
         mealrecs = []
