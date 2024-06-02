@@ -18,7 +18,7 @@ class Goal(BaseModel):
 
 # set goals to goal db with attached user id
 @router.post("/{user_id}")
-async def postGoals(goal: Goal, customer_id: int):
+async def postGoals(goal: Goal, user_id: int):
     if goal.daily_calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
     
