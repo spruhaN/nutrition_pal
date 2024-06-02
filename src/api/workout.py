@@ -32,6 +32,9 @@ async def postWorkout(workout: Workout, user_id: int):
                     """
         res = connection.execute(sqlalchemy.text(find_qry), {"w_name": workout.name}).first()
 
+        if not res:
+            raise HTTPException(status_code=404, detail="Nutrition Pal does not have that workout in it's database")
+        
         print(res.id)
         
         insert_sql = """
