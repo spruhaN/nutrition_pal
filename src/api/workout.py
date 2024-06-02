@@ -17,9 +17,9 @@ class Workout(BaseModel):
     reps: int
     length: int  # Duration of the workout in minutes
 
-# finds workout under excercises(exercise_id, name, muscle_group_id) and attaches id and info to customer workout with reps
-@router.post("/{customer_id}")
-async def postWorkout(workout: Workout, customer_id: int):
+# finds workout under excercises(exercise_id, name, muscle_group_id) and attaches id and info to user workout with reps
+@router.post("/{user_id}")
+async def postWorkout(workout: Workout, user_id: int):
     
     if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
             raise HTTPException(status_code=422, detail="Cannot input sets, reps, or length values <0")
@@ -35,14 +35,14 @@ async def postWorkout(workout: Workout, customer_id: int):
         print(res.id)
         
         insert_sql = """
-                    INSERT INTO customer_workouts (exercise_id, sets, reps, length, customer_id)
-                    VALUES (:e_id, :sets, :reps, :length, :customer_id)
+                    INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
+                    VALUES (:e_id, :sets, :reps, :length, :user_id)
                     """
-        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "customer_id": customer_id})
+        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "user_id": user_id})
     return "OK"
 
-@router.get("/{customer_id}/day")
-async def getWorkoutsByDay(customer_id: int):
+@router.get("/{user_id}/day")
+async def getWorkoutsByDay(user_id: int):
     with db.engine.begin() as connection:
         sql = """
                 SELECT
@@ -53,12 +53,12 @@ async def getWorkoutsByDay(customer_id: int):
                     cw.sets,
                     cw.reps,
                     cw.length
-                FROM customer_workouts AS cw
+                FROM user_workouts AS cw
                 JOIN exercises AS e ON cw.exercise_id = e.id
                 JOIN muscle_groups AS mg ON e.muscle_group_id = mg.muscle_group_id
-                WHERE cw.customer_id = :cid and DATE(time) = DATE('now')
+                WHERE cw.user_id = :cid and DATE(time) = DATE('now')
                 """
-        result = connection.execute(sqlalchemy.text(sql), {"cid": customer_id}).mappings().all()
+        result = connection.execute(sqlalchemy.text(sql), {"cid": user_id}).mappings().all()
 
     return result
 
@@ -97,15 +97,15 @@ async def getWorkoutMuscleGroups(workout_id: int):
 
 
 # Recommends a workout for the user and the given type
-@router.get("/recommend/{customer_id}/{type}")
-async def recWorkout(customer_id: int, type: str):
+@router.get("/recommend/{user_id}/{type}")
+async def recWorkout(user_id: int, type: str):
     with db.engine.begin() as connection:
         sql = "WITH recent AS (\
                     SELECT\
                         exercise_id\
-                    FROM customer_workouts\
+                    FROM user_workouts\
                     WHERE \
-                        customer_id = :customer_id AND\
+                        user_id = :user_id AND\
                         time >= CURRENT_DATE - 3\)\
                 SELECT\
                     e.name AS name,\
@@ -113,7 +113,7 @@ async def recWorkout(customer_id: int, type: str):
                     ROUND(AVG(c.reps)) AS reps\
                 FROM exercises AS e\
                 JOIN\
-                    customer_workouts AS c ON c.exercise_id = e.id\
+                    user_workouts AS c ON c.exercise_id = e.id\
                 JOIN \
                     muscle_groups AS m ON m.muscle_group_id = e.muscle_group_id\
                 WHERE\
@@ -122,7 +122,7 @@ async def recWorkout(customer_id: int, type: str):
                 GROUP BY e.name"
         
         workout_list = connection.execute(sqlalchemy.text(sql), 
-                                      [{"customer_id" : customer_id,
+                                      [{"user_id" : user_id,
                                         "type" : type}]).fetchall()
         if len(workout_list) == 0:
             return {"message": "No workout available for given type"}

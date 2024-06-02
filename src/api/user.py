@@ -24,8 +24,8 @@ async def postUser(user: User):
 
     with db.engine.begin() as connection:
         sql = """
-        INSERT INTO customer (name, weight, height)
-        VALUES (:name, :weight, :height) RETURNING customer_id
+        INSERT INTO user (name, weight, height)
+        VALUES (:name, :weight, :height) RETURNING user_id
         """
         result = connection.execute(sqlalchemy.text(sql), user.dict()).scalar_one()
     return {"id": result}
