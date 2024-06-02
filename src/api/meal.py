@@ -29,7 +29,7 @@ async def postMeal(meal: Meal, user_id: int):
         sql = "INSERT INTO meal (name, calories, user_id, ingredient_id, rating, type)\
             VALUES (:name, :calories, :user_id, :ingredient_id, :rating, :type)"
         
-        result = connection.execute(sqlalchemy.text(sql), 
+        connection.execute(sqlalchemy.text(sql), 
                                     [{"name": meal.name, "calories": meal.calories, 
                                       "user_id": user_id, "ingredient_id": 1,
                                       "rating" : meal.rating, "type": meal.type}])
@@ -43,7 +43,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
     
     with db.engine.begin() as connection:
-            sql = "UPDATE meal SET calories = :calories, meal = :meal, rating = :rating, type = :type\
+            sql = "UPDATE meal SET calories = :calories, name = :name, rating = :rating, type = :type\
                 WHERE user_id = :user_id AND meal_id = :meal_id"
             
             connection.execute(sqlalchemy.text(sql), 
@@ -58,7 +58,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
 @router.get("/{user_id}/day")
 async def getAllMeals(user_id: int):
     with db.engine.begin() as connection:
-        sql = "SELECT name, calories, time, meal_id FROM meal WHERE user_id = :user_id"
+        sql = "SELECT name, calories, type, rating, time, meal_id FROM meal WHERE user_id = :user_id"
         meals = connection.execute(sqlalchemy.text(sql), [{"user_id": user_id}]).fetchall()
 
         meal_list = []
@@ -66,8 +66,9 @@ async def getAllMeals(user_id: int):
             meal_list.append(
                 {"name": meal.name,
                  "calories": meal.calories,
-                 "time": meal.time,
                  "type": meal.type,
+                 "rating" : meal.rating,
+                 "time": meal.time,
                  "meal_id" : meal.meal_id
                  }
             )
@@ -89,14 +90,14 @@ async def getRecommendedMeal(user_id: int):
                                             [{"user_id": user_id}]).fetchone()[0]
         
         calories_left = daily_calories[0] - calories
-        newsql = "SELECT name, calories, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated\
+        newsql = "SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated\
                     FROM meal\
                     WHERE calories<:calories_left AND ((time <= CURRENT_DATE - 2 AND user_id = :user_id) OR user_id != :user_id)\
                     ORDER BY rated DESC\
                     LIMIT 3"
         meals = connection.execute(sqlalchemy.text(newsql),
                                         [{"user_id": user_id, "calories_left": calories_left}]).fetchall()
-        if not meals:
+        if not meals or len(meals) == 0:
             raise HTTPException(status_code=404, detail="No prior meals in the database to recommend from")
         
         mealrecs = []
@@ -104,5 +105,6 @@ async def getRecommendedMeal(user_id: int):
             mealrecs.append({
                 "meal_name" : meal.name,
                 "calories" : meal.calories,
+                "type" : meal.type
             })
     return mealrecs
