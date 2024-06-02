@@ -28,10 +28,10 @@ POSTS a user to the DB
 
 ```json
 {
-    "success": "boolean"
+    "id": "integer"
 }
 ```
-### 1.1. POST meal - `/meal/` (POST)
+### 1.1. POST meal - `/meal/{user_id}` (POST)
 
 POSTS a meal to the db, with primary ingredient and calories
 
@@ -41,42 +41,34 @@ POSTS a meal to the db, with primary ingredient and calories
     {
         "type": "string", /*Mexican, Asian, Indian, whatever type*/
         "calories": "integer",
+        "rating" : "integer",
+        "name" : "string"
     }
 ```
 
 **Response**
 
-```json
-{
-    "success": "boolean"
-}
-```
+"OK"
 
-### 1.2. Goals - `/goal/` (POST)
+### 1.2. Goals - `/goal/{user_id}` (POST)
 
 Writes a goal to the db so the person can see what they committed to
 
 **Request**:
 
 ```json
-[
   {
     "goal": "string",
     "type": "string", /* either diet or workout*/
     "daily_calories" : "integer"
   }
-]
 ```
 **Response**:
 
-```json
-{
-    "success": "boolean"
-}
-```
+"OK"
 
 
-### 1.3. Daily Calories Needed - `/daily_calories/{customer_id}/` (GET)
+### 1.3. Daily Calories Needed - `/daily_calories/{user_id}/` (GET)
 
 Get's how many calories you need to meet your daily goal
 
@@ -84,7 +76,7 @@ Get's how many calories you need to meet your daily goal
 
 ```json
 {
-  "customer_id": "integer"
+  "user_id": "integer"
 }
 ```
 
@@ -96,7 +88,7 @@ Get's how many calories you need to meet your daily goal
 }
 ```
 
-### 1.4. Average Daily Calories - `/daily_calories/{customer_id}/average` (GET)
+### 1.4. Average Daily Calories - `/daily_calories/{user_id}/average` (GET)
 
 Gets how many average calories a user has consumed over the last x days along with their biggest meal
 
@@ -104,7 +96,7 @@ Gets how many average calories a user has consumed over the last x days along wi
 
 ```json
 {
-  "customer_id": "integer",
+  "user_id": "integer",
   "over_days": "integer"
 }
 ```
@@ -112,7 +104,7 @@ Gets how many average calories a user has consumed over the last x days along wi
 
 
 
-### 1.5. Post Workout - `/workout/` (POST)
+### 1.5. Post Workout - `/workout/{user_id}` (POST)
 
 Posts a workout to the db, ID of muscle groups can be assigned by the db
 
@@ -135,7 +127,7 @@ Posts a workout to the db, ID of muscle groups can be assigned by the db
 }
 ```
 
-### 1.6. Get meals eaten - `/meal/day` (GET)
+### 1.6. Get meals eaten - `/meal/{user_id}/day` (GET)
 
 Get all meals eaten
 
@@ -147,12 +139,13 @@ Get all meals eaten
         "id": "integer",
         "type": "string", 
         "calories": "integer",
-        "date": "timeday"
+        "date": "timeday",
+        "rating" : "integer"
     }
 ]
 ```
 
-### 1.7. Get all workouts - `/workout/day` (GET)
+### 1.7. Get all workouts - `/workout/{user_id}/day` (GET)
 
 Get all meals eaten
 
