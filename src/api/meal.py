@@ -43,7 +43,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
     
     with db.engine.begin() as connection:
-            sql = "UPDATE meal SET calories = :calories, meal = :meal, rating = :rating, type = :type\
+            sql = "UPDATE meal SET calories = :calories, name = :name, rating = :rating, type = :type\
                 WHERE user_id = :user_id AND meal_id = :meal_id"
             
             connection.execute(sqlalchemy.text(sql), 
