@@ -157,4 +157,17 @@ async def recWorkout(user_id: int, type: str):
     return workouts
 
 
- 
+@router.get("/all_workouts")
+async def getAllWorkouts():
+    with db.engine.begin() as connection:
+        sql = """SELECT
+                exercises.name, muscle_groups.group, muscle_groups.type
+                FROM
+                exercises
+                JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.muscle_group_id;
+                """
+        
+        workout_list = connection.execute(sqlalchemy.text(sql)).fetchall()
+        if len(workout_list) == 0:
+            return {"message": "No workouts listed"}
+    return workout_list
