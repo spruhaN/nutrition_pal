@@ -46,7 +46,7 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
             sql = "UPDATE meal SET calories = :calories, meal = :meal, rating = :rating, type = :type\
                 WHERE user_id = :user_id AND meal_id = :meal_id"
             
-            update = connection.execute(sqlalchemy.text(sql), 
+            connection.execute(sqlalchemy.text(sql), 
                                         [{"name" : meal.name, "calories" : meal.calories,
                                           "rating" : meal.rating, "type" : meal.type,
                                           "user_id" : user_id, "meal_id" : meal_id}])
