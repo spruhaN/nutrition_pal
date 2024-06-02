@@ -32,7 +32,12 @@ async def postWorkout(workout: Workout, user_id: int):
                     """
         res = connection.execute(sqlalchemy.text(find_qry), {"w_name": workout.name}).first()
 
-        print(res.id)
+        if res is None:
+            workout_sql = """ SELECT name FROM exercises """
+            workouts = connection.execute(sqlalchemy.text(workout_sql)).fetchall()
+            print(workouts)
+            return {"Acceptable inputs" : workouts}
+
         
         insert_sql = """
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
@@ -76,6 +81,13 @@ async def getMuscleGroups(type: str):
                 WHERE mg.type = :m_type
                 """
         result = connection.execute(sqlalchemy.text(sql), {"m_type": type}).mappings().all()
+
+        if result is None:
+            sql = """ SELECT DISTINCT type FROM muscle_groups """
+            types = connection.execute(sqlalchemy.text(sql))
+            print(types)
+            return {"Acceptable inputs" : types}
+
     return result
 
 
@@ -93,6 +105,13 @@ async def getWorkoutMuscleGroups(workout_id: int):
                 WHERE e.id = :w_id
                 """
         muscle_groups = connection.execute(sqlalchemy.text(sql), {"w_id": workout_id}).mappings().all()
+
+        if muscle_groups is None:
+            sql = """ SELECT muscle-group_id, group FROM muscle_groups"""
+            pairings = connection.execute(sqlalchemy.text(sql))
+            print(pairings)
+            return {"Acceptable inputs" : pairings}
+
     return muscle_groups
 
 
