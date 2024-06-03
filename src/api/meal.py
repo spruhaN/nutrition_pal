@@ -85,14 +85,14 @@ async def getRecommendedMeal(user_id: int):
             raise HTTPException(status_code=404, detail="User does not have daily_calories")
         
         sql = "SELECT COALESCE(SUM(calories), 0) FROM meal WHERE user_id = :user_id\
-            AND DATE(time) = DATE('now')"
+            AND EXTRACT(DAY FROM AGE(NOW(), time)) =  0"
         calories = connection.execute(sqlalchemy.text(sql), 
                                             [{"user_id": user_id}]).fetchone()[0]
         
         calories_left = daily_calories[0] - calories
         newsql = "SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated\
                     FROM meal\
-                    WHERE calories<:calories_left AND ((time <= CURRENT_DATE - 2 AND user_id = :user_id) OR user_id != :user_id)\
+                    WHERE calories<:calories_left AND ((EXTRACT(DAY FROM AGE(NOW(), time)) > 2 AND user_id = :user_id) OR user_id != :user_id)\
                     ORDER BY rated DESC\
                     LIMIT 3"
         meals = connection.execute(sqlalchemy.text(newsql),
