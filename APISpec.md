@@ -279,3 +279,36 @@ Returns a list of workouts for a given type you haven't done in the past three d
     }
 ]
 ```
+
+### ACCEPTABLE WORKOUTS AND INFO FOR ENDPOINTS
+| name                  | type  | group         | muscle_group_id |
+| --------------------- | ----- | ------------- | --------------- |
+| bicep_curl            | arms  | bicep         | 1               |
+| tricep_pushdown       | arms  | tricep        | 8               |
+| lat_pulldown          | back  | lats          | 2               |
+| wrist_curl            | arms  | forearm       | 9               |
+| cable_curl            | arms  | bicep         | 1               |
+| skull_crusher         | arms  | tricep        | 8               |
+| preacher_curl         | arms  | bicep         | 1               |
+| cable_row             | back  | traps         | 3               |
+| pull_up               | back  | lats          | 2               |
+| bent_over_dumbell_row | back  | lats          | 2               |
+| hammer_curl           | arms  | bicep         | 1               |
+| pec_fly               | chest | upper_chest   | 10              |
+| bench_press           | chest | upper_chest   | 10              |
+| deadlift              | legs  | glutes        | 15              |
+| overhead_press        | arms  | shoulders     | 7               |
+| chest_press           | chest | upper_chest   | 10              |
+| rear_delt_flys        | arms  | shoulders     | 7               |
+| lat_raises            | arms  | shoulders     | 7               |
+| shoulder_press        | arms  | shoulders     | 7               |
+| squat                 | legs  | quads         | 14              |
+| bulgarian_split_squat | legs  | quads         | 14              |
+| leg_press             | legs  | quads         | 14              |
+| romanian_deadlift     | legs  | hamstrings    | 13              |
+| hip_thrust            | legs  | glutes        | 15              |
+| hamstring_curl        | legs  | hamstrings    | 13              |
+| leg_extension         | legs  | quads         | 14              |
+| calf_raise            | legs  | calves        | 16              |
+| treadmill             | legs  | glutes        | 15              |
+| sit-ups               | abs   | lower_abdomen | 11              |
