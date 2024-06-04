@@ -62,22 +62,39 @@ For each endpoint, list how many ms it took to execute. State which three endpoi
 
 
 ### /workout/{user_id}
+41ms
+
 ### /workout/{user_id}/day
+39ms
+
 ### /workout/muscle_groups/{type}
+2.1ms
+
 ### /workout/{workout_id}/muscle_groups
+0.8ms
+
+
 ### /workout/recommend/{user_id}/{type}
+350ms
 
 ### (POST)/goal/{customer_id}
+41.6ms
+
 ### (UPDATE)/goal/{customer_id}
+0.75ms
 
 ### /user/
+1.8ms
 
 ### /daily_calories/{user_id}
+77ms
+
 ### /daily_calories{user_id}/average
+38.400ms
 
 # Performance tuning
 For each of the three slowest endpoints, run explain on the queries and copy the results of running explain into the markdown file. Then describe what the explain means to you and what index you will add to speed up the query. Then copy the command for adding that index into the markdown and rerun explain. Then copy the results of that explain into the markdown and say if it had the performance improvement you expected. Continue this process until the three slowest endpoints are now acceptably fast (think about what this means for your service).
 
-### 1.
-### 2.
-### 3. 
+### 1. /meal/{user_id}/recommend
+### 2. /workout/recommend/{user_id}/{type}
+### 3. /daily_calories/{user_id}
