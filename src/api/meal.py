@@ -122,7 +122,7 @@ async def getRecommendedMeal(user_id: int):
                                             [{"user_id": user_id}]).fetchone()[0]
         
         calories_left = daily_calories[0] - calories
-        print(f"daily cal: {daily_calories[0]}")
+        print(f"daily cal: {daily_calories[0]} {calories_left}")
         newsql = """SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated
                     FROM meals
                     WHERE calories<:calories_left AND ((EXTRACT(DAY FROM AGE(NOW(), time)) > 2 AND user_id = :user_id) OR user_id != :user_id)
