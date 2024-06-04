@@ -24,7 +24,7 @@ async def postWorkout(workout: Workout, user_id: int):
         sql = "SELECT name FROM users WHERE user_id = :user_id"
         res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
         if not res:
-            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+            raise HTTPException(status_code=422, detail="User does not exist, create an account with /user/")
     
     
         if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
@@ -41,13 +41,13 @@ async def postWorkout(workout: Workout, user_id: int):
             workout_sql = """ SELECT name FROM exercises """
             workouts = connection.execute(sqlalchemy.text(workout_sql)).fetchall()
             print(workouts)
-            return {"Acceptable inputs" : workouts}
+            return {"Acceptable inputs" : workouts.list}
 
         insert_sql = """
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
                     VALUES (:e_id, :sets, :reps, :length, :user_id)
                     """
-        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "user_id": user_id})
+        connection.execute(sqlalchemy.text(insert_sql), [{"e_id": res.id}, {"user_id": user_id}, {"length":workout.length}, {"reps": workout.reps}, {"sets": workout.sets}])
     return "OK"
 
 @router.get("/{user_id}/day")
@@ -97,7 +97,7 @@ async def getMuscleGroups(type: str):
             sql = """ SELECT DISTINCT type FROM muscle_groups """
             types = connection.execute(sqlalchemy.text(sql))
             print(types)
-            return {"Acceptable inputs" : types}
+            return {"Acceptable inputs" : types.list}
 
     return result
 
@@ -121,7 +121,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
             sql = """ SELECT muscle-group_id, group FROM muscle_groups"""
             pairings = connection.execute(sqlalchemy.text(sql))
             print(pairings)
-            return {"Acceptable inputs" : pairings}
+            return {"Acceptable inputs" : pairings.list}
 
     return muscle_groups
 

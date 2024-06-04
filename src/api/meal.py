@@ -30,8 +30,8 @@ async def postMeal(meal: Meal, user_id: int):
     if meal.calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
     
-    if meal.rating > 10 or meal.rating <0:
-        raise HTTPException(status_code=422, detail="Ratings must be in between 1 and 10")
+    if meal.rating > 6 or meal.rating < 0:
+        raise HTTPException(status_code=422, detail="Ratings must be in between 1 and 5")
     
     with db.engine.begin() as connection:
         sql = """INSERT INTO meals (name, calories, user_id, rating, type)
