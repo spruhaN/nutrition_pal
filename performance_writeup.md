@@ -117,35 +117,37 @@ CREATE INDEX idx_meal_calories_time ON meal(calories, time);
 I attempted to add a lot of indexes but none of them seemed to significantly increase the efficiency of this endpoint. The sequential scan on meal for the time and user_id seems to take a bulk of the time of this endpoint but I can't figure out how to properly index it so that it makes the query faster.
 
 ### 2. /workout/recommend/{user_id}/{type}
-GroupAggregate  (cost=30140.66..30161.95 rows=200 width=96) (actual time=205.838..217.240 rows=3 loops=1) <br>
-Group Key: e.name<br>
-->  Sort  (cost=30140.66..30144.98 rows=1729 width=40) (actual time=200.398..207.320 rows=72369 loops=1)<br>
-Sort Key: e.name<br>
-Sort Method: external merge  Disk: 2416kB<br>
-->  Hash Join  (cost=13422.72..30047.68 rows=1729 width=40) (actual time=33.567..182.741 rows=72369 loops=1)    <br>      
-Hash Cond: (c.exercise_id = e.id)<br>
-->  Seq Scan on user_workouts c  (cost=13378.96..28674.78 rows=350073 width=16) (actual time=33.510..137.209 rows=676098 loops=1)   <br> 
-Filter: (NOT (hashed SubPlan 1))<br>
-Rows Removed by Filter: 24049 <br>
-SubPlan 1<br>
-->  Gather  (cost=1000.00..13378.95 rows=4 width=8) (actual time=33.494..33.557 rows=1 loops=1)  <br>
-Workers Planned: 2<br>
-Workers Launched: 2      <br>
-->  Parallel Seq Scan on user_workouts  (cost=0.00..12378.55 rows=2 width=8) (actual time=21.144..31.059 rows=0 loops=3)<br>
-Filter: ((user_id = 12413) AND ("time" >= (CURRENT_DATE - 3)))<br>
-Rows Removed by Filter: 233382       <br>                      
-->  Hash  (cost=43.69..43.69 rows=5 width=40) (actual time=0.043..0.045 rows=4 loops=1)<br>
-Buckets: 1024  Batches: 1  Memory Usage: 9kB    <br>     
-->  Hash Join  (cost=20.18..43.69 rows=5 width=40) (actual time=0.038..0.043 rows=4 loops=1)<br>
-Hash Cond: (e.muscle_group_id = m.muscle_group_id)<br>
-->  Seq Scan on exercises e  (cost=0.00..20.70 rows=1070 width=48) (actual time=0.003..0.004 rows=29 loops=1)<br>
-->  Hash  (cost=20.12..20.12 rows=4 width=8) (actual time=0.009..0.010 rows=4 loops=1)<br>
-Buckets: 1024  Batches: 1  Memory Usage: 9kB<br>
-->  Seq Scan on muscle_groups m  (cost=0.00..20.12 rows=4 width=8) (actual time=0.005..0.007 rows=4 loops=1)<br>
-Filter: ((type)::text = 'back'::text)   <br>                   
-Rows Removed by Filter: 10<br>
-Planning Time: 0.555 ms<br>
-Execution Time: 217.905 ms <br>                              
+| QUERY PLAN                                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GroupAggregate  (cost=30140.70..30161.99 rows=200 width=96) (actual time=176.181..184.986 rows=3 loops=1)                                            |
+|   Group Key: e.name                                                                                                                                  |
+|   ->  Sort  (cost=30140.70..30145.03 rows=1729 width=40) (actual time=170.676..176.536 rows=72369 loops=1)                                           |
+|         Sort Key: e.name                                                                                                                             |
+|         Sort Method: external merge  Disk: 2416kB                                                                                                    |
+|         ->  Hash Join  (cost=13422.73..30047.72 rows=1729 width=40) (actual time=29.217..154.342 rows=72369 loops=1)                                 |
+|               Hash Cond: (c.exercise_id = e.id)                                                                                                      |
+|               ->  Seq Scan on user_workouts c  (cost=13378.98..28674.83 rows=350074 width=16) (actual time=29.167..116.055 rows=676099 loops=1)      |
+|                     Filter: (NOT (hashed SubPlan 1))                                                                                                 |
+|                     Rows Removed by Filter: 24049                                                                                                    |
+|                     SubPlan 1                                                                                                                        |
+|                       ->  Gather  (cost=1000.00..13378.97 rows=4 width=8) (actual time=4.801..29.194 rows=1 loops=1)                                 |
+|                             Workers Planned: 2                                                                                                       |
+|                             Workers Launched: 2                                                                                                      |
+|                             ->  Parallel Seq Scan on user_workouts  (cost=0.00..12378.57 rows=2 width=8) (actual time=17.955..26.035 rows=0 loops=3) |
+|                                   Filter: ((user_id = 12413) AND ("time" >= (CURRENT_DATE - 3)))                                                     |
+|                                   Rows Removed by Filter: 233382                                                                                     |
+|               ->  Hash  (cost=43.69..43.69 rows=5 width=40) (actual time=0.036..0.038 rows=4 loops=1)                                                |
+|                     Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                                     |
+|                     ->  Hash Join  (cost=20.18..43.69 rows=5 width=40) (actual time=0.032..0.037 rows=4 loops=1)                                     |
+|                           Hash Cond: (e.muscle_group_id = m.muscle_group_id)                                                                         |
+|                           ->  Seq Scan on exercises e  (cost=0.00..20.70 rows=1070 width=48) (actual time=0.013..0.015 rows=29 loops=1)              |
+|                           ->  Hash  (cost=20.12..20.12 rows=4 width=8) (actual time=0.006..0.007 rows=4 loops=1)                                     |
+|                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                         |
+|                                 ->  Seq Scan on muscle_groups m  (cost=0.00..20.12 rows=4 width=8) (actual time=0.003..0.005 rows=4 loops=1)         |
+|                                       Filter: ((type)::text = 'back'::text)                                                                          |
+|                                       Rows Removed by Filter: 10                                                                                     |
+| Planning Time: 0.561 ms                                                                                                                              |
+| Execution Time: 185.546 ms                                                                                                                           |                            
 
 First joins the user_workouts with exercises and muscle_groups <br>
 Filters out rows not for specific type <br>
@@ -154,41 +156,41 @@ Return! <br>
 
 Adding Index onto user_id in user_workouts table led to time of 89ms.<br>
 
-| QUERY PLAN                                                                                                                                                      |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Finalize GroupAggregate  (cost=11830.90..11893.27 rows=200 width=96) (actual time=140.255..141.703 rows=3 loops=1)                                              |
-|   Group Key: e.name                                                                                                                                             |
-|   ->  Gather Merge  (cost=11830.90..11886.27 rows=400 width=96) (actual time=138.740..141.672 rows=9 loops=1)                                                   |
-|         Workers Planned: 2                                                                                                                                      |
-|         Workers Launched: 2                                                                                                                                     |
-|         ->  Partial GroupAggregate  (cost=10830.88..10840.08 rows=200 width=96) (actual time=132.070..134.759 rows=3 loops=3)                                   |
-|               Group Key: e.name                                                                                                                                 |
-|               ->  Sort  (cost=10830.88..10832.68 rows=720 width=40) (actual time=130.835..131.992 rows=24123 loops=3)                                           |
-|                     Sort Key: e.name                                                                                                                            |
-|                     Sort Method: quicksort  Memory: 2304kB                                                                                                      |
-|                     Worker 0:  Sort Method: quicksort  Memory: 2213kB                                                                                           |
-|                     Worker 1:  Sort Method: quicksort  Memory: 2312kB                                                                                           |
-|                     ->  Hash Join  (cost=52.29..10796.71 rows=720 width=40) (actual time=0.982..125.608 rows=24123 loops=3)                                     |
-|                           Hash Cond: (c.exercise_id = e.id)                                                                                                     |
-|                           ->  Parallel Seq Scan on user_workouts c  (cost=8.54..10199.14 rows=145864 width=16) (actual time=0.690..109.343 rows=225366 loops=3) |
-|                                 Filter: (NOT (hashed SubPlan 1))                                                                                                |
-|                                 Rows Removed by Filter: 8016                                                                                                    |
-|                                 SubPlan 1                                                                                                                       |
-|                                   ->  Index Scan using e_index on user_workouts  (cost=0.42..8.53 rows=4 width=8) (actual time=0.442..0.443 rows=1 loops=3)     |
-|                                         Index Cond: (user_id = 12413)                                                                                           |
-|                                         Filter: ("time" >= (CURRENT_DATE - 3))                                                                                  |
-|                           ->  Hash  (cost=43.69..43.69 rows=5 width=40) (actual time=0.270..0.272 rows=4 loops=3)                                               |
-|                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                                    |
-|                                 ->  Hash Join  (cost=20.18..43.69 rows=5 width=40) (actual time=0.264..0.268 rows=4 loops=3)                                    |
-|                                       Hash Cond: (e.muscle_group_id = m.muscle_group_id)                                                                        |
-|                                       ->  Seq Scan on exercises e  (cost=0.00..20.70 rows=1070 width=48) (actual time=0.111..0.112 rows=29 loops=3)             |
-|                                       ->  Hash  (cost=20.12..20.12 rows=4 width=8) (actual time=0.145..0.146 rows=4 loops=3)                                    |
-|                                             Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                        |
-|                                             ->  Seq Scan on muscle_groups m  (cost=0.00..20.12 rows=4 width=8) (actual time=0.140..0.142 rows=4 loops=3)        |
-|                                                   Filter: ((type)::text = 'back'::text)                                                                         |
-|                                                   Rows Removed by Filter: 10                                                                                    |
-| Planning Time: 12.338 ms                                                                                                                                        |
-| Execution Time: 141.896 ms                                                                                                                                      |
+| QUERY PLAN                                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finalize GroupAggregate  (cost=11830.90..11893.27 rows=200 width=96) (actual time=59.244..60.601 rows=3 loops=1)                                               |
+|   Group Key: e.name                                                                                                                                            |
+|   ->  Gather Merge  (cost=11830.90..11886.27 rows=400 width=96) (actual time=57.751..60.589 rows=9 loops=1)                                                    |
+|         Workers Planned: 2                                                                                                                                     |
+|         Workers Launched: 2                                                                                                                                    |
+|         ->  Partial GroupAggregate  (cost=10830.88..10840.08 rows=200 width=96) (actual time=51.839..54.453 rows=3 loops=3)                                    |
+|               Group Key: e.name                                                                                                                                |
+|               ->  Sort  (cost=10830.88..10832.68 rows=720 width=40) (actual time=50.126..51.436 rows=24123 loops=3)                                            |
+|                     Sort Key: e.name                                                                                                                           |
+|                     Sort Method: quicksort  Memory: 2392kB                                                                                                     |
+|                     Worker 0:  Sort Method: quicksort  Memory: 2165kB                                                                                          |
+|                     Worker 1:  Sort Method: quicksort  Memory: 2271kB                                                                                          |
+|                     ->  Hash Join  (cost=52.29..10796.71 rows=720 width=40) (actual time=0.084..45.558 rows=24123 loops=3)                                     |
+|                           Hash Cond: (c.exercise_id = e.id)                                                                                                    |
+|                           ->  Parallel Seq Scan on user_workouts c  (cost=8.54..10199.14 rows=145864 width=16) (actual time=0.051..31.557 rows=225366 loops=3) |
+|                                 Filter: (NOT (hashed SubPlan 1))                                                                                               |
+|                                 Rows Removed by Filter: 8016                                                                                                   |
+|                                 SubPlan 1                                                                                                                      |
+|                                   ->  Index Scan using c_index on user_workouts  (cost=0.42..8.53 rows=4 width=8) (actual time=0.027..0.027 rows=1 loops=3)    |
+|                                         Index Cond: (user_id = 12413)                                                                                          |
+|                                         Filter: ("time" >= (CURRENT_DATE - 3))                                                                                 |
+|                           ->  Hash  (cost=43.69..43.69 rows=5 width=40) (actual time=0.024..0.025 rows=4 loops=3)                                              |
+|                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                                   |
+|                                 ->  Hash Join  (cost=20.18..43.69 rows=5 width=40) (actual time=0.018..0.023 rows=4 loops=3)                                   |
+|                                       Hash Cond: (e.muscle_group_id = m.muscle_group_id)                                                                       |
+|                                       ->  Seq Scan on exercises e  (cost=0.00..20.70 rows=1070 width=48) (actual time=0.004..0.006 rows=29 loops=3)            |
+|                                       ->  Hash  (cost=20.12..20.12 rows=4 width=8) (actual time=0.007..0.008 rows=4 loops=3)                                   |
+|                                             Buckets: 1024  Batches: 1  Memory Usage: 9kB                                                                       |
+|                                             ->  Seq Scan on muscle_groups m  (cost=0.00..20.12 rows=4 width=8) (actual time=0.003..0.004 rows=4 loops=3)       |
+|                                                   Filter: ((type)::text = 'back'::text)                                                                        |
+|                                                   Rows Removed by Filter: 10                                                                                   |
+| Planning Time: 0.867 ms                                                                                                                                        |
+| Execution Time: 60.892 ms                                                                                                                                      |
 
 ### 3. /daily_calories/{user_id}
 | QUERY PLAN                                                                                                                                   |
