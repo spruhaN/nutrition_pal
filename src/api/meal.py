@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from api.daily_calories import getDailyCalories
 from src.api import auth
 from src import database as db
 import sqlalchemy
@@ -111,8 +110,21 @@ async def getRecommendedMeal(user_id: int):
             raise HTTPException(status_code=422, detail="User does not exist, create an account with /user/")
     
     with db.engine.begin() as connection:
-        calories_left = getDailyCalories(user_id)
-        print(f"daily cal: {calories_left}")
+        sql = "SELECT daily_calories FROM goals WHERE user_id = :user_id"
+        daily_calories = connection.execute(sqlalchemy.text(sql), 
+                                            [{"user_id": user_id}]).fetchone()
+        if not daily_calories:
+            raise HTTPException(status_code=422, detail="User does not have daily_calories, set a goal with /goals/")
+        
+        sql = """SELECT COALESCE(SUM(calories), 0) s WHERE user_id = :user_id
+            AND EXTRACT(DAY FROM AGE(NOW(), time)) =  0"""
+        calories = connection.execute(sqlalchemy.text(sql), 
+                                            [{"user_id": user_id}]).fetchone()[0]
+        if not calories:
+            calories = 0;
+        
+        calories_left = daily_calories[0] - calories
+        print(f"daily cal: {daily_calories[0]} {calories_left}")
         newsql = """SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated
                     FROM meals
                     WHERE calories<:calories_left AND ((EXTRACT(DAY FROM AGE(NOW(), time)) > 2 AND user_id = :user_id) OR user_id != :user_id)

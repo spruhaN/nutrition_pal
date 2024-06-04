@@ -27,10 +27,9 @@ async def postWorkout(workout: Workout, user_id: int):
             raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
     
     
-    if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
-            raise HTTPException(status_code=422, detail="Cannot input sets, reps, or length values <0")
+        if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
+                raise HTTPException(status_code=422, detail="Cannot input sets, reps, or length values < 1")
     
-    with db.engine.begin() as connection:
         find_qry = """
                     SELECT id as id
                     FROM exercises
@@ -44,7 +43,6 @@ async def postWorkout(workout: Workout, user_id: int):
             print(workouts)
             return {"Acceptable inputs" : workouts}
 
-        
         insert_sql = """
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
                     VALUES (:e_id, :sets, :reps, :length, :user_id)
@@ -54,13 +52,13 @@ async def postWorkout(workout: Workout, user_id: int):
 
 @router.get("/{user_id}/day")
 async def getWorkoutsByDay(user_id: int):
+    
     with db.engine.begin() as connection:
         sql = "SELECT name FROM users WHERE user_id = :user_id"
         res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
         if not res:
             raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
     
-    with db.engine.begin() as connection:
         sql = """
                 SELECT
                     e.id,
@@ -137,7 +135,6 @@ async def recWorkout(user_id: int, type: str):
         if not res:
             raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
     
-    with db.engine.begin() as connection:
         sql = """WITH recent AS (
                     SELECT
                         exercise_id
