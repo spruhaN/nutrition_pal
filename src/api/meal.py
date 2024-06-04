@@ -116,8 +116,8 @@ async def getRecommendedMeal(user_id: int):
         if not daily_calories:
             raise HTTPException(status_code=422, detail="User does not have daily_calories, set a goal with /goals/")
         
-        sql = """SELECT COALESCE(SUM(calories), 0) s WHERE user_id = :user_id
-            AND EXTRACT(DAY FROM AGE(NOW(), time)) =  0"""
+        sql = """SELECT COALESCE(SUM(calories), 0) FROM meal WHERE user_id = :user_id
+            AND EXTRACT(DAY FROM AGE(NOW(), time)) = 0"""
         calories = connection.execute(sqlalchemy.text(sql), 
                                             [{"user_id": user_id}]).fetchone()[0]
         if not calories:
@@ -131,7 +131,7 @@ async def getRecommendedMeal(user_id: int):
                     ORDER BY rated DESC
                     LIMIT 3"""
         meals = connection.execute(sqlalchemy.text(newsql),
-                                        [{"user_id": 66, "calories_left": 1000}]).fetchall()
+                                        [{"user_id": user_id, "calories_left": calories_left}]).fetchall()
         if not meals or len(meals) == 0:
             raise HTTPException(status_code=422, detail="No prior meals in the database to recommend from")
         

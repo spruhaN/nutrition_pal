@@ -52,7 +52,7 @@ async def postWorkout(workout: Workout, user_id: int):
 
 @router.get("/{user_id}/day")
 async def getWorkoutsByDay(user_id: int):
-    
+
     with db.engine.begin() as connection:
         sql = "SELECT name FROM users WHERE user_id = :user_id"
         res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
@@ -160,7 +160,7 @@ async def recWorkout(user_id: int, type: str):
                                       [{"user_id" : user_id,
                                         "type" : type}]).fetchall()
         if len(workout_list) == 0:
-            return {"message": "No workout available for given type"}
+            return {"message": "No workout available for given type, make sure type is [legs, front, back, or arms]"}
 
         workouts = []
         for workout in workout_list:
