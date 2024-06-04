@@ -112,7 +112,6 @@ async def getRecommendedMeal(user_id: int):
     
     with db.engine.begin() as connection:
         calories_left = getDailyCalories(user_id)
-        
         print(f"daily cal: {calories_left}")
         newsql = """SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated
                     FROM meals
