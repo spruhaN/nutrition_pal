@@ -20,6 +20,12 @@ class Workout(BaseModel):
 # finds workout under excercises(exercise_id, name, muscle_group_id) and attaches id and info to user workout with reps
 @router.post("/{user_id}")
 async def postWorkout(workout: Workout, user_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     
     if (workout.sets < 1) or (workout.reps < 1) or (workout.length < 1):
             raise HTTPException(status_code=422, detail="Cannot input sets, reps, or length values <0")
@@ -49,6 +55,12 @@ async def postWorkout(workout: Workout, user_id: int):
 @router.get("/{user_id}/day")
 async def getWorkoutsByDay(user_id: int):
     with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
+    with db.engine.begin() as connection:
         sql = """
                 SELECT
                     e.id,
@@ -70,6 +82,7 @@ async def getWorkoutsByDay(user_id: int):
 # returns a list of workouts that target the given type
 @router.get("/muscle_groups/{type}")
 async def getMuscleGroups(type: str):
+    
     with db.engine.begin() as connection:
         sql = """
                 SELECT
@@ -118,6 +131,12 @@ async def getWorkoutMuscleGroups(workout_id: int):
 # Recommends a workout for the user and the given type
 @router.get("/recommend/{user_id}/{type}")
 async def recWorkout(user_id: int, type: str):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     with db.engine.begin() as connection:
         sql = """WITH recent AS (
                     SELECT
