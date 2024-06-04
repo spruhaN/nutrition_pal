@@ -53,28 +53,71 @@ For each endpoint, list how many ms it took to execute. State which three endpoi
 For each of the three slowest endpoints, run explain on the queries and copy the results of running explain into the markdown file. Then describe what the explain means to you and what index you will add to speed up the query. Then copy the command for adding that index into the markdown and rerun explain. Then copy the results of that explain into the markdown and say if it had the performance improvement you expected. Continue this process until the three slowest endpoints are now acceptably fast (think about what this means for your service).
 
 ### 1. /meal/{user_id}/recommend
-|QUERY PLAN   
-| Limit  (cost=32829.67..32829.68 rows=3 width=55) (actual time=538.826..538.927 rows=3 loops=1) <br>
-|   ->  Sort  (cost=32829.67..33162.74 rows=133229 width=55) (actual time=538.825..538.925 rows=3 loops=1)  <br>
-|   Sort Key: (CASE WHEN (meal.user_id = 199993) THEN (meal.rating * 2) ELSE meal.rating END) DESC  <br>
-|  Sort Method: top-N heapsort  Memory: 25kB   <br>
-| ->  Nested Loop  (cost=8597.60..31107.71 rows=133229 width=55) (actual time=26.063..471.054 rows=399687 loops=1)   <br>
-|    Join Filter: ((meal.calories)::numeric < ((goals.daily_calories)::numeric - (COALESCE(sum(meal_1.calories), '0'::numeric))))<br>  
-|    ->  Nested Loop  (cost=8597.60..8605.65 rows=1 width=40) (actual time=26.035..26.137 rows=1 loops=1)      <br>
-|   ->  Index Scan using goals_customer_id_key on goals  (cost=0.42..8.44 rows=1 width=8) (actual time=0.027..0.030 rows=1 loops=1)  <br>
-|    Index Cond: (user_id = 199993)   <br>
-|     ->  Aggregate  (cost=8597.18..8597.19 rows=1 width=32) (actual time=26.005..26.103 rows=1 loops=1)    <br>
-|     ->  Gather  (cost=1000.00..8597.17 rows=1 width=8) (actual time=25.966..26.082 rows=2 loops=1)        <br>
-|      Workers Planned: 2                                                                                                    |<br>
-|      Workers Launched: 2                                                                                                   |<br>
-|     ->  Parallel Seq Scan on meal meal_1  (cost=0.00..7597.07 rows=1 width=8) (actual time=20.128..20.132 rows=1 loops=3) |<br>
-|    Filter: ((user_id = 199993) AND (EXTRACT(day FROM age(now(), "time")) = '0'::numeric))                          |<br>
-|     Rows Removed by Filter: 133229                                                                                  |<br>
-|    ->  Seq Scan on meal  (cost=0.00..13842.20 rows=399686 width=63) (actual time=0.015..230.076 rows=399687 loops=1)                       |<br>
-|      Filter: (((EXTRACT(day FROM age(now(), "time")) > '2'::numeric) AND (user_id = 199993)) OR (user_id <> 199993))                   |<br>
-|      Rows Removed by Filter: 2                                                                                                         |<br>
-| Planning Time: 2.616 ms                                                                                     |<br>
-| Execution Time: 539.081 ms    <br>
+QUERY PLAN                                                                                                                                            |
+----------------------------------------------------------------------------------------------------------------------------------------------------- |
+Limit  (cost=32829.67..32829.68 rows=3 width=55) (actual time=538.826..538.927 rows=3 loops=1)                                                        |
+  ->  Sort  (cost=32829.67..33162.74 rows=133229 width=55) (actual time=538.825..538.925 rows=3 loops=1)                                              |
+        Sort Key: (CASE WHEN (meal.user_id = 199993) THEN (meal.rating * 2) ELSE meal.rating END) DESC                                                |
+        Sort Method: top-N heapsort  Memory: 25kB                                                                                                     |
+        ->  Nested Loop  (cost=8597.60..31107.71 rows=133229 width=55) (actual time=26.063..471.054 rows=399687 loops=1)                              |
+              Join Filter: ((meal.calories)::numeric < ((goals.daily_calories)::numeric - (COALESCE(sum(meal_1.calories), '0'::numeric))))            |
+              ->  Nested Loop  (cost=8597.60..8605.65 rows=1 width=40) (actual time=26.035..26.137 rows=1 loops=1)                                    |
+                    ->  Index Scan using goals_customer_id_key on goals  (cost=0.42..8.44 rows=1 width=8) (actual time=0.027..0.030 rows=1 loops=1)   |
+                          Index Cond: (user_id = 199993)                                                                                              |
+                    ->  Aggregate  (cost=8597.18..8597.19 rows=1 width=32) (actual time=26.005..26.103 rows=1 loops=1)                                |
+                          ->  Gather  (cost=1000.00..8597.17 rows=1 width=8) (actual time=25.966..26.082 rows=2 loops=1)                              |
+                                Workers Planned: 2                                                                                                    |
+                                Workers Launched: 2                                                                                                   |
+                                ->  Parallel Seq Scan on meal meal_1  (cost=0.00..7597.07 rows=1 width=8) (actual time=20.128..20.132 rows=1 loops=3) |
+                                      Filter: ((user_id = 199993) AND (EXTRACT(day FROM age(now(), "time")) = '0'::numeric))                          |
+                                      Rows Removed by Filter: 133229                                                                                  |
+              ->  Seq Scan on meal  (cost=0.00..13842.20 rows=399686 width=63) (actual time=0.015..230.076 rows=399687 loops=1)                       |
+                    Filter: (((EXTRACT(day FROM age(now(), "time")) > '2'::numeric) AND (user_id = 199993)) OR (user_id <> 199993))                   |
+                    Rows Removed by Filter: 2                                                                                                         |
+Planning Time: 2.616 ms                                                                                                                               |
+Execution Time: 539.081 ms                                                                                                                            |
+
+This explain tells me that most of the time is coming from scanning through the meals table looking for meals with the right calorie range. This leads me to believe that adding an index on calories in the meal table will speed this query up significantly.
+
+CREATE INDEX idx_goals_user_id ON goals(user_id);
+
+-- Index on meal.user_id
+CREATE INDEX idx_meal_user_id ON meal(user_id);
+
+-- Index on meal.time
+CREATE INDEX idx_meal_time ON meal(time);
+
+-- Composite index on meal.user_id and meal.time
+CREATE INDEX idx_meal_user_time ON meal(user_id, time);
+
+-- Index on meal.calories
+CREATE INDEX idx_meal_calories ON meal(calories);
+
+CREATE INDEX idx_meal_user_calories ON meal(user_id, calories);
+CREATE INDEX idx_meal_calories_time ON meal(calories, time);
+
+| QUERY PLAN                                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Limit  (cost=24241.02..24241.03 rows=3 width=55) (actual time=453.986..453.988 rows=3 loops=1)                                                             |
+|   ->  Sort  (cost=24241.02..24574.09 rows=133229 width=55) (actual time=453.984..453.986 rows=3 loops=1)                                                   |
+|         Sort Key: (CASE WHEN (meal.user_id = 199993) THEN (meal.rating * 2) ELSE meal.rating END) DESC                                                     |
+|         Sort Method: top-N heapsort  Memory: 25kB                                                                                                          |
+|         ->  Nested Loop  (cost=8.90..22519.06 rows=133229 width=55) (actual time=0.079..394.394 rows=399687 loops=1)                                       |
+|               Join Filter: ((meal.calories)::numeric < ((goals.daily_calories)::numeric - (COALESCE(sum(meal_1.calories), '0'::numeric))))                 |
+|               ->  Nested Loop  (cost=8.90..16.95 rows=1 width=40) (actual time=0.061..0.066 rows=1 loops=1)                                                |
+|                     ->  Index Scan using idx_goals_user_id on goals  (cost=0.42..8.44 rows=1 width=8) (actual time=0.027..0.030 rows=1 loops=1)            |
+|                           Index Cond: (user_id = 199993)                                                                                                   |
+|                     ->  Aggregate  (cost=8.48..8.49 rows=1 width=32) (actual time=0.031..0.032 rows=1 loops=1)                                             |
+|                           ->  Index Scan using idx_meal_user_id on meal meal_1  (cost=0.42..8.48 rows=1 width=8) (actual time=0.025..0.027 rows=2 loops=1) |
+|                                 Index Cond: (user_id = 199993)                                                                                             |
+|                                 Filter: (EXTRACT(day FROM age(now(), "time")) = '0'::numeric)                                                              |
+|               ->  Seq Scan on meal  (cost=0.00..13842.23 rows=399687 width=63) (actual time=0.016..205.009 rows=399687 loops=1)                            |
+|                     Filter: (((EXTRACT(day FROM age(now(), "time")) > '2'::numeric) AND (user_id = 199993)) OR (user_id <> 199993))                        |
+|                     Rows Removed by Filter: 2                                                                                                              |
+| Planning Time: 1.109 ms                                                                                                                                    |
+| Execution Time: 454.144 ms           
+
+I attempted to add a lot of indexes but none of them seemed to significantly increase the efficiency of this endpoint. The sequential scan on meal for the time and user_id seems to take a bulk of the time of this endpoint but I can't figure out how to properly index it so that it makes the query faster.
 
 ### 2. /workout/recommend/{user_id}/{type}
 GroupAggregate  (cost=30140.66..30161.95 rows=200 width=96) (actual time=205.838..217.240 rows=3 loops=1) <br>
