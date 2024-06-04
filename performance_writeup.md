@@ -77,23 +77,20 @@ Limit  (cost=32829.67..32829.68 rows=3 width=55) (actual time=538.826..538.927 r
 Planning Time: 2.616 ms                                                                                                                               |
 Execution Time: 539.081 ms                                                                                                                            |
 
-This explain tells me that most of the time is coming from scanning through the meals table looking for meals with the right calorie range. This leads me to believe that adding an index on calories in the meal table will speed this query up significantly.
+This explain tells me that most of the time is coming from scanning through the meals table looking for meals with the right calorie range. This leads me to believe that adding an index on calories in the meal table will speed this query up significantly. there is also a block of time coming from filtering by the date range, so I will add an index on that as well.
 
 CREATE INDEX idx_goals_user_id ON goals(user_id);
 
--- Index on meal.user_id
 CREATE INDEX idx_meal_user_id ON meal(user_id);
 
--- Index on meal.time
 CREATE INDEX idx_meal_time ON meal(time);
 
--- Composite index on meal.user_id and meal.time
 CREATE INDEX idx_meal_user_time ON meal(user_id, time);
 
--- Index on meal.calories
 CREATE INDEX idx_meal_calories ON meal(calories);
 
 CREATE INDEX idx_meal_user_calories ON meal(user_id, calories);
+
 CREATE INDEX idx_meal_calories_time ON meal(calories, time);
 
 | QUERY PLAN                                                                                                                                                 |
