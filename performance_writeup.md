@@ -107,5 +107,12 @@ Rows Removed by Filter: 10<br>
 Planning Time: 0.555 ms<br>
 Execution Time: 217.905 ms <br>                              
 
+First joins the user_workouts with exercises and muscle_groups <br>
+Filters out rows not for specific type <br>
+Then gets exercises user has done in past three days and filters those out <br>
+Return! <br>
+
+Adding Index onto user_id in user_workouts table led to time of 89ms.<br>
+
 
 ### 3. /daily_calories/{user_id}
