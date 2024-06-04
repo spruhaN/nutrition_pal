@@ -19,6 +19,12 @@ class Goal(BaseModel):
 # set goals to goal db with attached user id
 @router.post("/{user_id}")
 async def postGoals(goal: Goal, user_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     if goal.daily_calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
     
@@ -39,6 +45,12 @@ async def postGoals(goal: Goal, user_id: int):
 # Updates goal information
 @router.put("/{user_id}")
 async def updateGoal(goal: Goal, user_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     if goal.daily_calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input calorie goal of less than 1")
     

@@ -19,8 +19,8 @@ class User(BaseModel):
 # add user to user db and return user id
 @router.post("/")
 async def postUser(user: User):
-    if user.weight < 1 or user.weight < 1:
-        raise HTTPException(status_code=422, detail="Cannot input 0 weight or height")
+    if user.weight < 60 or user.height < 40:
+        raise HTTPException(status_code=422, detail="Cannot input invalid weight or height")
 
     with db.engine.begin() as connection:
         sql = """

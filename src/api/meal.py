@@ -21,23 +21,32 @@ class Meal(BaseModel):
 # user uploades meal onto db
 @router.post("/{user_id}")
 async def postMeal(meal: Meal, user_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
 
     if meal.calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
     
     with db.engine.begin() as connection:
-        sql = "INSERT INTO meal (name, calories, user_id, ingredient_id, rating, type)\
-            VALUES (:name, :calories, :user_id, :ingredient_id, :rating, :type)"
+        sql = """INSERT INTO meal (name, calories, user_id, rating, type)
+            VALUES (:name, :calories, :user_id, :rating, :type)"""
         
         connection.execute(sqlalchemy.text(sql), 
                                     [{"name": meal.name, "calories": meal.calories, 
-                                      "user_id": user_id, "ingredient_id": 1,
-                                      "rating" : meal.rating, "type": meal.type}])
+                                      "user_id": user_id, "rating" : meal.rating, "type": meal.type}])
     return "OK"
 
 
 @router.put('/{user_id}/{meal_id}')
 async def updateMeal(meal: Meal, user_id: int, meal_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
 
     if meal.calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
@@ -58,6 +67,12 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
 @router.get("/{user_id}/day")
 async def getAllMeals(user_id: int):
     with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
+    with db.engine.begin() as connection:
         sql = "SELECT name, calories, type, rating, time, meal_id FROM meal WHERE user_id = :user_id"
         meals = connection.execute(sqlalchemy.text(sql), [{"user_id": user_id}]).fetchall()
 
@@ -77,6 +92,12 @@ async def getAllMeals(user_id: int):
 # Gets at most 3 meals recommended to the user based on their previous preferences and their caloric needs
 @router.get("/{user_id}/recommend")
 async def getRecommendedMeal(user_id: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     with db.engine.begin() as connection:
         sql = "SELECT daily_calories FROM goals WHERE user_id = :user_id"
         daily_calories = connection.execute(sqlalchemy.text(sql), 

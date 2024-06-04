@@ -15,6 +15,12 @@ router = APIRouter(
 @router.get('/{user_id}')
 async def getDailyCalories(user_id: int):
     with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
+    with db.engine.begin() as connection:
         sql = "SELECT daily_calories FROM goals WHERE user_id = :user_id"
         daily_calories = connection.execute(sqlalchemy.text(sql), 
                                             [{"user_id": user_id}]).fetchone()
@@ -33,6 +39,12 @@ async def getDailyCalories(user_id: int):
 # user gets an average calorie intake over the last x days as well as their most caloric meal
 @router.get("{user_id}/average")
 async def getAverageMeals(user_id: int, over_days: int):
+    with db.engine.begin() as connection:
+        sql = "SELECT name FROM users WHERE user_id = :user_id"
+        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        if not res:
+            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+    
     with db.engine.begin() as connection:
         sql = """
                 SELECT name, calories
