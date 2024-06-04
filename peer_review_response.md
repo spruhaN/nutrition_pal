@@ -1,6 +1,4 @@
-## INITIAL EDITS, NEED TO DO MORE
-
-Code Review Edits
+## Code Review Edits
 
 
 ## https://github.com/spruhaN/nutrition_pal/issues/7 - Sam Todd
