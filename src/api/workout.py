@@ -41,7 +41,7 @@ async def postWorkout(workout: Workout, user_id: int):
             workout_sql = """ SELECT name FROM exercises """
             workouts = connection.execute(sqlalchemy.text(workout_sql)).fetchall()
             print(workouts)
-            return {"Acceptable inputs" : workouts.list}
+            return [{"Acceptable inputs" : str(workouts)}]
 
         insert_sql = """
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
@@ -97,7 +97,7 @@ async def getMuscleGroups(type: str):
             sql = """ SELECT DISTINCT type FROM muscle_groups """
             types = connection.execute(sqlalchemy.text(sql))
             print(types)
-            return {"Acceptable inputs" : types.list}
+            return [{"Acceptable inputs" : str(types)}]
 
     return result
 
@@ -121,7 +121,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
             sql = """ SELECT muscle-group_id, group FROM muscle_groups"""
             pairings = connection.execute(sqlalchemy.text(sql))
             print(pairings)
-            return {"Acceptable inputs" : pairings.list}
+            return [{"Acceptable inputs" : str(pairings)}]
 
     return muscle_groups
 
