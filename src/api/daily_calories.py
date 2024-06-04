@@ -31,7 +31,8 @@ async def getDailyCalories(user_id: int):
             AND EXTRACT(DAY FROM AGE(NOW(), time)) = 0"
         calories = connection.execute(sqlalchemy.text(sql), 
                                             [{"user_id": user_id}]).fetchone()[0]
-        
+        if not calories:
+            calories = 0
         calories_left = daily_calories[0] - calories
     return {"calories_left" : calories_left}
 
