@@ -47,7 +47,7 @@ async def postWorkout(workout: Workout, user_id: int):
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
                     VALUES (:e_id, :sets, :reps, :length, :user_id)
                     """
-        connection.execute(sqlalchemy.text(insert_sql), [{"e_id": res.id}, {"user_id": user_id}, {"length":workout.length}, {"reps": workout.reps}, {"sets": workout.sets}])
+        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "user_id": user_id})
     return "OK"
 
 @router.get("/{user_id}/day")
