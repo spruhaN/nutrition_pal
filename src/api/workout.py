@@ -182,7 +182,7 @@ async def getAllWorkouts():
                 JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.muscle_group_id;
                 """
         
-        workout_list = connection.execute(sqlalchemy.text(sql)).fetchall()
+        workout_list = connection.execute(sqlalchemy.text(sql)).mappings().all()
         if len(workout_list) == 0:
             return {"message": "No workouts listed"}
     return workout_list
