@@ -159,3 +159,42 @@ Adding Index onto user_id in user_workouts table led to time of 89ms.<br>
 
 
 ### 3. /daily_calories/{user_id}
+| QUERY PLAN                                                                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aggregate  (cost=8601.64..8601.65 rows=1 width=32) (actual time=23.446..27.458 rows=1 loops=1)                                               |
+|   ->  Nested Loop  (cost=1000.42..8601.63 rows=1 width=8) (actual time=23.364..27.449 rows=2 loops=1)                                        |
+|         ->  Gather  (cost=1000.00..8597.18 rows=1 width=8) (actual time=23.256..27.335 rows=2 loops=1)                                       |
+|               Workers Planned: 2                                                                                                             |
+|               Workers Launched: 2                                                                                                            |
+|               ->  Parallel Seq Scan on meal  (cost=0.00..7597.08 rows=1 width=8) (actual time=19.152..19.154 rows=1 loops=3)                 |
+|                     Filter: ((user_id = 199993) AND (EXTRACT(day FROM age(now(), "time")) = '0'::numeric))                                   |
+|                     Rows Removed by Filter: 133229                                                                                           |
+|         ->  Index Only Scan using goals_customer_id_key on goals  (cost=0.42..4.44 rows=1 width=0) (actual time=0.053..0.053 rows=1 loops=2) |
+|               Index Cond: (user_id = 199993)                                                                                                 |
+|               Heap Fetches: 0                                                                                                                |
+| Planning Time: 1.199 ms                                                                                                                      |
+| Execution Time: 27.638 ms                                                                                                                    |
+
+From looking at the explain analyze, I can tell that there is a parallel seq scan that takes up most of the time. The filter that it is doing
+is over the entire table and deals with the user_id and the time column of the meal table to filter the rows out that arent from the right
+user and aren't today. Then the analysis shows that it uses the default index of customer_id on the goals table to quickly find the user's goal.
+
+From this I am going to create an index on meals user_id and time
+
+create index idx_user_id_time on meal (user_id, time)
+
+
+| QUERY PLAN                                                                                                                                   |
+| -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aggregate  (cost=14.68..14.69 rows=1 width=32) (actual time=0.150..0.151 rows=1 loops=1)                                                     |
+|   ->  Nested Loop  (cost=0.84..14.67 rows=1 width=8) (actual time=0.136..0.145 rows=2 loops=1)                                               |
+|         ->  Index Scan using idx_user_id_time on meal  (cost=0.42..10.23 rows=1 width=8) (actual time=0.090..0.093 rows=2 loops=1)           |
+|               Index Cond: (user_id = 199993)                                                                                                 |
+|               Filter: (EXTRACT(day FROM age(now(), "time")) = '0'::numeric)                                                                  |
+|         ->  Index Only Scan using goals_customer_id_key on goals  (cost=0.42..4.44 rows=1 width=0) (actual time=0.023..0.023 rows=1 loops=2) |
+|               Index Cond: (user_id = 199993)                                                                                                 |
+|               Heap Fetches: 0                                                                                                                |
+| Planning Time: 1.111 ms                                                                                                                      |
+| Execution Time: 0.284 ms                                                                                                                     |
+
+This clearly drastically increased performance exactly how I wanted it to.
