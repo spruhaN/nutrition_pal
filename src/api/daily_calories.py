@@ -27,7 +27,7 @@ async def getDailyCalories(user_id: int):
         if not daily_calories:
             raise HTTPException(status_code=404, detail="User does not have daily_calories")
         
-        sql = """SELECT COALESCE(SUM(calories), 0) FROM meal WHERE user_id = :user_id
+        sql = """SELECT COALESCE(SUM(calories), 0) FROM meals WHERE user_id = :user_id
             AND EXTRACT(DAY FROM AGE(NOW(), time)) = 0"""
         calories = connection.execute(sqlalchemy.text(sql), 
                                             [{"user_id": user_id}]).fetchone()[0]
@@ -49,7 +49,7 @@ async def getAverageMeals(user_id: int, over_days: int):
     with db.engine.begin() as connection:
         sql = """
                 SELECT name, calories
-                FROM meal
+                FROM meals
                 WHERE user_id = :user_id AND EXTRACT(DAY FROM AGE(NOW(), time))<:range
                 ORDER BY calories
             """
