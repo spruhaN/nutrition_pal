@@ -93,7 +93,7 @@ async def getMuscleGroups(type: str):
                 """
         result = connection.execute(sqlalchemy.text(sql), {"m_type": type}).mappings().all()
 
-        if result is None:
+        if result is None or len(result) == 0:
             sql = """ SELECT DISTINCT type FROM muscle_groups """
             types = connection.execute(sqlalchemy.text(sql))
             print(types)
@@ -117,7 +117,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
                 """
         muscle_groups = connection.execute(sqlalchemy.text(sql), {"w_id": workout_id}).mappings().all()
 
-        if muscle_groups is None:
+        if muscle_groups is None or len(muscle_groups) == 0:
             sql = """ SELECT muscle-group_id, group FROM muscle_groups"""
             pairings = connection.execute(sqlalchemy.text(sql))
             print(pairings)
