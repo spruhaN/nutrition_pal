@@ -14,7 +14,7 @@ For each endpoint, list how many ms it took to execute. State which three endpoi
 3.881 ms
 
 ### /meal/{user_id}/day
-28.125 ms
+28 ms
 
 ### /meal/{user_id}/recommend
 539.081 ms
@@ -44,10 +44,10 @@ For each endpoint, list how many ms it took to execute. State which three endpoi
 1.8ms
 
 ### /daily_calories/{user_id}
-24ms
+28ms
 
 ### /daily_calories{user_id}/average
-38.400ms
+27ms
 
 # Performance tuning
 For each of the three slowest endpoints, run explain on the queries and copy the results of running explain into the markdown file. Then describe what the explain means to you and what index you will add to speed up the query. Then copy the command for adding that index into the markdown and rerun explain. Then copy the results of that explain into the markdown and say if it had the performance improvement you expected. Continue this process until the three slowest endpoints are now acceptably fast (think about what this means for your service).
