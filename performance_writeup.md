@@ -8,17 +8,16 @@ As for our justification we believe that our databases would source this way sin
 
 For each endpoint, list how many ms it took to execute. State which three endpoints were the slowest.
 ### /meal/{user_id}
-| Execution Time: 1.125 ms                                                                   
-### /meal/{user_id}/{meal_id}
-| Planning Time: 0.694 ms      <br>                                                                                         
-| Execution Time: 3.881 ms       <br>                                                                                       
-### /meal/{user_id}/day
-| Planning Time: 0.367 ms      <br>                                                                                     
-| Execution Time: 28.125 ms       <br>                                                                                  
-### /meal/{user_id}/recommend
-| Planning Time: 2.616 ms    <br>
-| Execution Time: 539.081 ms     <br>
+1.125 ms
 
+### /meal/{user_id}/{meal_id}
+3.881 ms
+
+### /meal/{user_id}/day
+28.125 ms
+
+### /meal/{user_id}/recommend
+539.081 ms
 
 ### /workout/{user_id}
 12ms
@@ -31,7 +30,6 @@ For each endpoint, list how many ms it took to execute. State which three endpoi
 
 ### /workout/{workout_id}/muscle_groups
 0.8ms
-
 
 ### /workout/recommend/{user_id}/{type}
 350ms
