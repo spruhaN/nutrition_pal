@@ -122,13 +122,14 @@ async def getRecommendedMeal(user_id: int):
                                             [{"user_id": user_id}]).fetchone()[0]
         
         calories_left = daily_calories[0] - calories
+        print(f"daily cal: {daily_calories[0]}")
         newsql = """SELECT name, calories, type, (CASE WHEN (user_id = :user_id) THEN rating*2 ELSE rating END) as rated
                     FROM meals
                     WHERE calories<:calories_left AND ((EXTRACT(DAY FROM AGE(NOW(), time)) > 2 AND user_id = :user_id) OR user_id != :user_id)
                     ORDER BY rated DESC
                     LIMIT 3"""
         meals = connection.execute(sqlalchemy.text(newsql),
-                                        [{"user_id": user_id, "calories_left": calories_left}]).fetchall()
+                                        [{"user_id": 66, "calories_left": 1000}]).fetchall()
         if not meals or len(meals) == 0:
             raise HTTPException(status_code=422, detail="No prior meals in the database to recommend from")
         
