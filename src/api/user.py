@@ -41,6 +41,8 @@ async def updateUser(user_id: int, user: User):
         if not exists:
             raise HTTPException(status_code=404, detail="User not found")
 
+        if user.weight < 60 or user.height < 40:
+            raise HTTPException(status_code=422, detail="Cannot input invalid weight or height")
         sql = """
         UPDATE customer SET name=:name, weight=:weight, height=:height
         WHERE customer_id=:id
