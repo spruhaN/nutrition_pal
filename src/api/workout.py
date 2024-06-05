@@ -96,7 +96,7 @@ async def getMuscleGroups(type: str):
 
         if result is None or len(result) == 0:
             sql = """ SELECT DISTINCT type FROM muscle_groups """
-            types = connection.execute(sqlalchemy.text(sql)).mappings.all()
+            types = connection.execute(sqlalchemy.text(sql)).mappings().all()
             print(types)
             return [{"Acceptable inputs" : str(types)}]
 
