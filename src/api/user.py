@@ -35,7 +35,7 @@ async def postUser(user: User):
 async def updateUser(user_id: int, user: User):
     with db.engine.begin() as connection:
         sql = "SELECT name FROM users WHERE user_id = :user_id"
-        res = connection.execute(text(sql), {"user_id": user_id}).fetchone()
+        res = connection.execute(sqlalchemy.text(sql), {"user_id": user_id}).fetchone()
         if not res:
             raise HTTPException(status_code=422, detail="User does not exist, create an account with /user/")
         
@@ -51,6 +51,6 @@ async def updateUser(user_id: int, user: User):
         WHERE
             users.user_id = :user_id;
         """
-        connection.execute(text(sql), {**user.dict(), "user_id": user_id})
+        connection.execute(sqlalchemy.text(sql), {**user.dict(), "user_id": user_id})
 
     return {"status": "User updated successfully"}
