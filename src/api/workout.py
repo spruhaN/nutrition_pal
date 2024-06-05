@@ -45,10 +45,11 @@ async def postWorkout(workout: Workout, user_id: int):
 
         insert_sql = """
                     INSERT INTO user_workouts (exercise_id, sets, reps, length, user_id)
-                    VALUES (:e_id, :sets, :reps, :length, :user_id)
+                    VALUES (:e_id, :sets, :reps, :length, :user_id) RETURNING exercise_id
                     """
-        connection.execute(sqlalchemy.text(insert_sql),workout.dict() | {"e_id": res.id, "user_id": user_id})
-    return "OK"
+        res = connection.execute(sqlalchemy.text(insert_sql), workout.dict() | {"e_id": res.id, "user_id": user_id}).first()
+        return {"id": res.exercise_id}
+
 
 @router.get("/{user_id}/day")
 async def getWorkoutsByDay(user_id: int):
@@ -57,7 +58,7 @@ async def getWorkoutsByDay(user_id: int):
         sql = "SELECT name FROM users WHERE user_id = :user_id"
         res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
         if not res:
-            raise HTTPException(status_code=404, detail="User does not exist, create an account with /user/")
+            raise HTTPException(status_code=422, detail="User does not exist, create an account with /user/")
     
         sql = """
                 SELECT

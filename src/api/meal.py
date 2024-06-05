@@ -35,12 +35,12 @@ async def postMeal(meal: Meal, user_id: int):
     
     with db.engine.begin() as connection:
         sql = """INSERT INTO meals (name, calories, user_id, rating, type)
-            VALUES (:name, :calories, :user_id, :rating, :type)"""
+            VALUES (:name, :calories, :user_id, :rating, :type) RETURNING meal_id"""
         
-        connection.execute(sqlalchemy.text(sql), 
+        res = connection.execute(sqlalchemy.text(sql), 
                                     [{"name": meal.name, "calories": meal.calories, 
-                                      "user_id": user_id, "rating" : meal.rating, "type": meal.type}])
-    return "OK"
+                                      "user_id": user_id, "rating" : meal.rating, "type": meal.type}]).first()
+    return {"id": res.meal_id}
 
 
 @router.put('/{user_id}/{meal_id}')
