@@ -177,8 +177,7 @@ async def recWorkout(user_id: int, type: str):
 @router.get("/all_workouts")
 async def getAllWorkouts():
     with db.engine.begin() as connection:
-        sql = """SELECT
-                exercises.name, exercises.id, muscle_groups.group, muscle_group.muscle_group_id
+        sql = """SELECT exercises.name, exercises.id, muscle_groups.group, muscle_groups.muscle_group_id
                 FROM exercises
                 JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.muscle_group_id;
                 """
