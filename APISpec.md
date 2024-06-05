@@ -10,7 +10,7 @@
 `/workout/muscle_groups/{type}`
 `/workout/{id}/muscle_groups/{type}`
 
-
+#### USER
 ### 1.1. POST user - `/user/` (POST)
 
 POSTS a user to the DB
@@ -31,7 +31,10 @@ POSTS a user to the DB
     "id": "integer"
 }
 ```
-### 1.1. POST meal - `/meal/{user_id}` (POST)
+
+
+#### MEALS
+### 2.1. POST meal - `/meal/{user_id}` (POST)
 
 POSTS a meal to the db, with primary ingredient and calories
 
@@ -50,84 +53,46 @@ POSTS a meal to the db, with primary ingredient and calories
 
 "OK"
 
-### 1.2. Goals - `/goal/{user_id}` (POST)
 
-Writes a goal to the db so the person can see what they committed to
+### 2.2. PUT meal - `/meal/{user_id}/{meal_id}` (PUT)
+
+POSTS a meal to the db, with primary ingredient and calories
 
 **Request**:
 
 ```json
+    {
+        "type": "string", /*Mexican, Asian, Indian, whatever type*/
+        "calories": "integer",
+        "rating" : "integer",
+        "name" : "string"
+    }
+```
+
+**Response**
+``` json
   {
-    "goal": "string",
-    "type": "string", /* either diet or workout*/
-    "daily_calories" : "integer"
+      "status" : "OK", 
+      "message": "Meal updated successfully"
   }
 ```
-**Response**:
 
-"OK"
-
-
-### 1.3. Daily Calories Needed - `/daily_calories/{user_id}/` (GET)
-
-Get's how many calories you need to meet your daily goal
-
-**Request**:
-
-```json
-{
-  "user_id": "integer"
-}
-```
+### 2.3. See workout you've done for that type - `/meal/{customer_id}/recommend` (GET)
+Returns at most 3 meals for a customer given their caloric needs for the day
 
 **Response**:
 
 ```json
-{
-  "calories_left": "integer"
-}
+[
+    {
+        "meal_name": "string", 
+        "calories": "integer",
+        "type" : "string"
+    }
+]
 ```
 
-### 1.4. Average Daily Calories - `/daily_calories/{user_id}/average` (GET)
-
-Gets how many average calories a user has consumed over the last x days along with their biggest meal
-
-**Request**:
-
-```json
-{
-  "user_id": "integer",
-  "over_days": "integer"
-}
-```
-
-
-
-
-### 1.5. Post Workout - `/workout/{user_id}` (POST)
-
-Posts a workout to the db, ID of muscle groups can be assigned by the db
-
-**Request**:
-
-```json
-{
-  "name": "string", /* May have restricted workout where the only options are like pushup, pull-up, cardio atm*/
-  "sets": "integer",
-  "reps": "integer",
-  "length": "integer" /* minutes */
-}
-```
-
-**Response**:
-
-```json
-{
-    "success": "boolean"
-}
-```
-
-### 1.6. Get meals eaten - `/meal/{user_id}/day` (GET)
+### 2.4. Get meals eaten - `/meal/{user_id}/day` (GET)
 
 Get all meals eaten
 
@@ -145,7 +110,98 @@ Get all meals eaten
 ]
 ```
 
-### 1.7. Get all workouts - `/workout/{user_id}/day` (GET)
+#### GOALS
+### 3.1. Goals - `/goal/{user_id}` (POST)
+
+Writes a goal to the db so the person can see what they committed to
+
+**Request**:
+
+```json
+  {
+    "goal": "string",
+    "type": "string", 
+    "daily_calories" : "integer"
+  }
+```
+**Response**:
+
+"OK"
+
+### 3.2. Goals - `/goal/{user_id}` (PUT)
+
+Writes a goal to the db so the person can see what they committed to
+
+**Request**:
+
+```json
+  {
+    "goal": "string",
+    "type": "string", 
+    "daily_calories" : "integer"
+  }
+```
+**Response**:
+
+```json
+{
+  "status": "OK",
+   "message" : "Successful update"
+}
+```
+
+
+#### DAILY CALORIES
+### 4.1. Daily Calories Needed - `/daily_calories/{user_id}/` (GET)
+
+Get's how many calories you need to meet your daily goal
+
+**Response**:
+
+```json
+{
+  "calories_left": "integer"
+}
+```
+
+### 4.2. Average Daily Calories - `/daily_calories/{user_id}/average` (GET)
+
+Gets how many average calories a user has consumed over the last x days along with their biggest meal
+
+**Request**:
+
+```json
+{
+  "user_id": "integer",
+  "over_days": "integer"
+}
+```
+
+
+
+#### WORKOUT
+### 5.1. Post Workout - `/workout/{user_id}` (POST)
+
+Posts a workout to the db, ID of muscle groups can be assigned by the db
+
+**Request**:
+
+```json
+{
+  "name": "string", /* May have restricted workout where the only options are like pushup, pull-up, cardio atm*/
+  "sets": "integer",
+  "reps": "integer",
+  "length": "integer" /* minutes */
+}
+```
+
+**Response**:
+
+"OK"
+
+
+
+### 5.2. Get all workouts - `/workout/{user_id}/day` (GET)
 
 Get all meals eaten
 
@@ -164,19 +220,22 @@ Get all meals eaten
 ]
 ```
 
-### 1.8. See what muscle group a workout hits - `/workout/{id}/muscle_groups` (GET)
-Sees what muscle group a workout hits, supplies the id
+### 5.3. See what muscle group a workout hits - `/workout/{workout_id}/muscle_groups` (GET)
+Gets workouts for very specific aspect of body (triceps, biceps...)
 
 **Response**:
 
 ```json
+[
     {
-      "type": "string",
-      "group": "string
+      "name" : "string",
+      "type" : "string",
+      "group" : "string"
     }
+]
 ```
 
-### 1.9. Search workouts by muscle groups - `/workout/muscle_groups/{type}` (GET)
+### 5.4. Search workouts by general body parts (chest, back...) - `/workout/muscle_groups/{type}` (GET)
 See workout for a specific muscle group, this is from a db of generic wrokouts separate from personal workouts
 
 **Response**:
@@ -184,42 +243,15 @@ See workout for a specific muscle group, this is from a db of generic wrokouts s
 ```json
 [
     {
-      "name" : "string"
+      "name" : "string",
+      "type" : "string",
+      "group" : "string"
     }
 ]
 ```
 
 
-### 1.10. See workout you've done for that type - `/workout/personal/muscle_groups/{type}` (GET)
-Returns a list of workouts you have done that correpsond to the type you set
-**Response**:
-
-```json
-[
-    {
-        "name": "string", /* May have restricted workout where the only options are like pushup, pull-up, cardio atm*/
-        "sets": "integer",
-        "reps": "integer",
-        "length": "integer", /* minutes */
-        "date" : "timeday"
-    }
-]
-```
-
-### 1.11. See workout you've done for that type - `/meal/{customer_id}/recommend` (GET)
-Returns at most 3 meals for a customer given their caloric needs for the day
-**Response**:
-
-```json
-[
-    {
-        "meal_name": "string", 
-        "calories": "integer",
-    }
-]
-```
-
-### 1.12. See workout you've done for that type - `/workout/recommend/{customer_id}/{type}` (GET)
+### 5.5. See workout you've done for that type - `/workout/recommend/{user_id}/{type}` (GET)
 Returns a list of workouts for a given type you haven't done in the past three days
 **Response**:
 
@@ -232,3 +264,51 @@ Returns a list of workouts for a given type you haven't done in the past three d
     }
 ]
 ```
+
+
+### 5.5. See workout you've done for that type - `/workout/all_workouts` (GET)
+Returns a list of workouts for a given type you haven't done in the past three days
+**Response**:
+
+```json
+[
+    {
+        "name": "string", 
+        "type": "integer",
+        "group": "integer"
+    }
+]
+```
+
+### ACCEPTABLE WORKOUTS AND INFO FOR ENDPOINTS
+| name                  | type  | group         | muscle_group_id |
+| --------------------- | ----- | ------------- | --------------- |
+| bicep_curl            | arms  | bicep         | 1               |
+| tricep_pushdown       | arms  | tricep        | 8               |
+| lat_pulldown          | back  | lats          | 2               |
+| wrist_curl            | arms  | forearm       | 9               |
+| cable_curl            | arms  | bicep         | 1               |
+| skull_crusher         | arms  | tricep        | 8               |
+| preacher_curl         | arms  | bicep         | 1               |
+| cable_row             | back  | traps         | 3               |
+| pull_up               | back  | lats          | 2               |
+| bent_over_dumbell_row | back  | lats          | 2               |
+| hammer_curl           | arms  | bicep         | 1               |
+| pec_fly               | chest | upper_chest   | 10              |
+| bench_press           | chest | upper_chest   | 10              |
+| deadlift              | legs  | glutes        | 15              |
+| overhead_press        | arms  | shoulders     | 7               |
+| chest_press           | chest | upper_chest   | 10              |
+| rear_delt_flys        | arms  | shoulders     | 7               |
+| lat_raises            | arms  | shoulders     | 7               |
+| shoulder_press        | arms  | shoulders     | 7               |
+| squat                 | legs  | quads         | 14              |
+| bulgarian_split_squat | legs  | quads         | 14              |
+| leg_press             | legs  | quads         | 14              |
+| romanian_deadlift     | legs  | hamstrings    | 13              |
+| hip_thrust            | legs  | glutes        | 15              |
+| hamstring_curl        | legs  | hamstrings    | 13              |
+| leg_extension         | legs  | quads         | 14              |
+| calf_raise            | legs  | calves        | 16              |
+| treadmill             | legs  | glutes        | 15              |
+| sit-ups               | abs   | lower_abdomen | 11              |
