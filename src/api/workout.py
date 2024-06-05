@@ -177,7 +177,7 @@ async def recWorkout(user_id: int, type: str):
 async def getAllWorkouts():
     with db.engine.begin() as connection:
         sql = """SELECT
-                exercises.name, muscle_groups.group, muscle_groups.type
+                exercises.id, exercises.name, muscle_groups.group, muscle_groups.type
                 FROM exercises
                 JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.muscle_group_id;
                 """
