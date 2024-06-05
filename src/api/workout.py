@@ -120,7 +120,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
 
         if muscle_groups is None or len(muscle_groups) == 0:
             sql = """ SELECT muscle_group_id, group_name FROM muscle_groups"""
-            pairings = connection.execute(sqlalchemy.text(sql)).mappings.all()
+            pairings = connection.execute(sqlalchemy.text(sql)).mappings().all()
             print(pairings)
             return [{"Acceptable inputs" : str(pairings)}]
 
