@@ -65,7 +65,7 @@ async def getWorkoutsByDay(user_id: int):
                     e.id,
                     e.name,
                     mg.type,
-                    mg.group,
+                    mg.group_name,
                     cw.sets,
                     cw.reps,
                     cw.length
@@ -87,7 +87,7 @@ async def getMuscleGroups(type: str):
                 SELECT
                     e.name,
                     mg.type,
-                    mg.group
+                    mg.group_name
                 FROM exercises AS e
                 JOIN muscle_groups AS mg ON mg.muscle_group_id = e.muscle_group_id
                 WHERE mg.type = :m_type
@@ -111,7 +111,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
                 SELECT
                 e.name,
                 mg.type,
-                mg.group
+                mg.group_name
                 FROM exercises AS e
                 JOIN muscle_groups AS mg ON mg.muscle_group_id = e.muscle_group_id
                 WHERE e.id = :w_id
@@ -119,7 +119,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
         muscle_groups = connection.execute(sqlalchemy.text(sql), {"w_id": workout_id}).mappings().all()
 
         if muscle_groups is None or len(muscle_groups) == 0:
-            sql = """ SELECT muscle-group_id, group FROM muscle_groups"""
+            sql = """ SELECT muscle_group_id, group_name FROM muscle_groups"""
             pairings = connection.execute(sqlalchemy.text(sql))
             print(pairings)
             return [{"Acceptable inputs" : str(pairings)}]
@@ -177,7 +177,7 @@ async def recWorkout(user_id: int, type: str):
 @router.get("/all_workouts")
 async def getAllWorkouts():
     with db.engine.begin() as connection:
-        sql = """SELECT exercises.name, exercises.id, muscle_groups.group, muscle_groups.muscle_group_id
+        sql = """SELECT exercises.name, exercises.id, muscle_groups.group_name, muscle_groups.muscle_group_id
                 FROM exercises
                 JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.muscle_group_id;
                 """
