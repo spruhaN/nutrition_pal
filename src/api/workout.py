@@ -195,7 +195,7 @@ async def getAllMuscleGroups():
                 SELECT
                     id,
                     type,
-                    group
+                    group_name
                 FROM muscle_groups
                 """
         result = connection.execute(sqlalchemy.text(sql)).mappings().all()
