@@ -50,20 +50,20 @@ async def getAverageMeals(user_id: int, over_days: int):
         sql = """
                 SELECT name, calories
                 FROM meals
-                WHERE user_id = :user_id AND EXTRACT(DAY FROM AGE(NOW(), time))<:range
-                ORDER BY calories
+                WHERE user_id = :user_id AND EXTRACT(DAY FROM AGE(NOW(), time)) < :days_range
+                ORDER BY calories DESC
             """
-        calories = connection.execute(sqlalchemy.text(sql), [{"user_id":user_id, "range":over_days}]).fetchall()
+        meals = connection.execute(sqlalchemy.text(sql), [{"user_id":user_id, "range":over_days}]).fetchall()
 
+        if not meals:
+            raise HTTPException(status_code=404, detail="No meals found for the given period.")
+        
         calorie_total = 0
-        biggest_meal = ""
-        i = 0
-        for cal in calories:
-            if i == 0:
-                biggest_meal = cal[0]
-            calorie_total+=cal[1]
-            i+=1
-        calorie_avg = calorie_total/over_days
+        biggest_meal = meals[0][0]
+        for meal in meals:
+            calorie_total += meal[1]
+        
+        calorie_avg = calorie_total / len(meals) if meals else 0
         return {
             "biggest meal": biggest_meal,
             "average calories": calorie_avg
