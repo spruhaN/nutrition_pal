@@ -39,7 +39,7 @@ async def postWorkout(workout: Workout, user_id: int):
 
         if res is None:
             workout_sql = """ SELECT name FROM exercises """
-            workouts = connection.execute(sqlalchemy.text(workout_sql)).fetchall()
+            workouts = connection.execute(sqlalchemy.text(workout_sql)).mappings.all()
             print(workouts)
             return [{"Acceptable inputs" : str(workouts)}]
 
@@ -96,7 +96,7 @@ async def getMuscleGroups(type: str):
 
         if result is None or len(result) == 0:
             sql = """ SELECT DISTINCT type FROM muscle_groups """
-            types = connection.execute(sqlalchemy.text(sql))
+            types = connection.execute(sqlalchemy.text(sql)).mappings.all()
             print(types)
             return [{"Acceptable inputs" : str(types)}]
 
@@ -120,7 +120,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
 
         if muscle_groups is None or len(muscle_groups) == 0:
             sql = """ SELECT muscle_group_id, group_name FROM muscle_groups"""
-            pairings = connection.execute(sqlalchemy.text(sql))
+            pairings = connection.execute(sqlalchemy.text(sql)).mappings.all()
             print(pairings)
             return [{"Acceptable inputs" : str(pairings)}]
 
