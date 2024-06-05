@@ -18,7 +18,7 @@ POSTS a user to the DB
 
 ```json
     {
-        "name": "string", /*Mexican, Asian, Indian, whatever type*/
+        "name": "string", /*Any name*/
         "weight": "integer", /* pounds */
         "height" : "integer" /* inches
     }
@@ -32,6 +32,19 @@ POSTS a user to the DB
 }
 ```
 
+### 1.2. Update user - `/user/{user_id}` (PUT)
+
+Updates an existing user in the DB
+
+**Request**:
+
+```json
+{
+    "name": "string", /* new name of the user */
+    "weight": "integer", /* new weight, in pounds */
+    "height": "integer" /* new height, in inches */
+}
+```
 
 #### MEALS
 ### 2.1. POST meal - `/meal/{user_id}` (POST)
@@ -219,8 +232,27 @@ Get all meals eaten
     }
 ]
 ```
+### 5.3. GET all muscle groups - `/workout/muscle_groups` (GET)
 
-### 5.3. See what muscle group a workout hits - `/workout/{workout_id}/muscle_groups` (GET)
+Retrieves a list of all muscle groups from the database.
+
+**Request**:
+- No parameters required.
+
+**Response**:
+
+```json
+[
+    {
+        "id": "integer",
+        "type": "string", /* General category like 'back' or 'arms' */
+        "group": "string" /* Specific muscle group like 'bicep' or 'lats' */
+    }
+]
+```
+
+
+### 5.4. See what muscle group a workout hits - `/workout/{workout_id}/muscle_groups` (GET)
 Gets workouts for very specific aspect of body (triceps, biceps...)
 
 **Response**:
@@ -235,7 +267,7 @@ Gets workouts for very specific aspect of body (triceps, biceps...)
 ]
 ```
 
-### 5.4. Search workouts by general body parts (chest, back...) - `/workout/muscle_groups/{type}` (GET)
+### 5.5. Search workouts by general body parts (chest, back...) - `/workout/muscle_groups/{type}` (GET)
 See workout for a specific muscle group, this is from a db of generic wrokouts separate from personal workouts
 
 **Response**:
@@ -251,7 +283,7 @@ See workout for a specific muscle group, this is from a db of generic wrokouts s
 ```
 
 
-### 5.5. See workout you've done for that type - `/workout/recommend/{user_id}/{type}` (GET)
+### 5.6. See workout you've done for that type - `/workout/recommend/{user_id}/{type}` (GET)
 Returns a list of workouts for a given type you haven't done in the past three days
 **Response**:
 
@@ -266,7 +298,7 @@ Returns a list of workouts for a given type you haven't done in the past three d
 ```
 
 
-### 5.5. See workout you've done for that type - `/workout/all_workouts` (GET)
+### 5.7. See workout you've done for that type - `/workout/all_workouts` (GET)
 Returns a list of workouts for a given type you haven't done in the past three days
 **Response**:
 

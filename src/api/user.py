@@ -29,3 +29,22 @@ async def postUser(user: User):
         """
         result = connection.execute(sqlalchemy.text(sql), user.dict()).scalar_one()
     return {"id": result}
+
+# update user info in db
+@router.put("/{user_id}")
+async def updateUser(user_id: int, user: User):
+    with db.engine.begin() as connection:
+        exists = connection.execute(
+            sqlalchemy.text("SELECT EXISTS(SELECT 1 FROM customer WHERE customer_id = :id)"),
+            {"id": user_id}
+        ).scalar_one()
+        if not exists:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        sql = """
+        UPDATE customer SET name=:name, weight=:weight, height=:height
+        WHERE customer_id=:id
+        """
+        connection.execute(sqlalchemy.text(sql), {**user.dict(), "id": user_id})
+
+    return {"status": "User updated successfully"}
