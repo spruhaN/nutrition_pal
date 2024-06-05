@@ -59,8 +59,8 @@ async def updateMeal(meal: Meal, user_id: int, meal_id: int):
     if meal.calories < 1:
         raise HTTPException(status_code=422, detail="Cannot input 0 or negative calories")
     
-    if meal.rating > 10 or meal.rating <0:
-        raise HTTPException(status_code=422, detail="Ratings must be in between 1 and 10")
+    if meal.rating > 5 or meal.rating < 0:
+        raise HTTPException(status_code=422, detail="Ratings must be in between 1 and 5")
     
     with db.engine.begin() as connection:
             sql = "UPDATE meals SET calories = :calories, name = :name, rating = :rating, type = :type\
