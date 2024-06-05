@@ -193,7 +193,7 @@ async def getAllMuscleGroups():
     with db.engine.begin() as connection:
         sql = """
                 SELECT
-                    id,
+                    muscle_group_id,
                     type,
                     group_name
                 FROM muscle_groups
