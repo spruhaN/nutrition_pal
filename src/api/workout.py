@@ -186,3 +186,17 @@ async def getAllWorkouts():
         if len(workout_list) == 0:
             return {"message": "No workouts listed"}
     return workout_list
+
+# gets all muscle groups and their types
+@router.get("/all_muscle_groups")
+async def getAllMuscleGroups():
+    with db.engine.begin() as connection:
+        sql = """
+                SELECT
+                    id,
+                    type,
+                    group
+                FROM muscle_groups
+                """
+        result = connection.execute(sqlalchemy.text(sql)).mappings().all()
+    return [dict(row) for row in result]  

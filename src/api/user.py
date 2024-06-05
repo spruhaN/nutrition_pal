@@ -48,17 +48,3 @@ async def updateUser(user_id: int, user: User):
         connection.execute(sqlalchemy.text(sql), {**user.dict(), "id": user_id})
 
     return {"status": "User updated successfully"}
-
-# gets all muscle groups and their types
-@router.get("/muscle_groups")
-async def getAllMuscleGroups():
-    with db.engine.begin() as connection:
-        sql = """
-                SELECT
-                    id,
-                    type,
-                    group
-                FROM muscle_groups
-                """
-        result = connection.execute(sqlalchemy.text(sql)).mappings().all()
-    return [dict(row) for row in result]  
