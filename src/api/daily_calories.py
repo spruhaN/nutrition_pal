@@ -50,7 +50,7 @@ async def getAverageMeals(user_id: int, over_days: int):
         sql = """
                 SELECT name, calories
                 FROM meals
-                WHERE user_id = :user_id AND EXTRACT(DAY FROM AGE(NOW(), time)) < :days_range
+                WHERE user_id = :user_id AND EXTRACT(DAY FROM AGE(NOW(), time)) < :range
                 ORDER BY calories DESC
             """
         meals = connection.execute(sqlalchemy.text(sql), [{"user_id":user_id, "range":over_days}]).fetchall()
