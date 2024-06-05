@@ -39,7 +39,7 @@ async def postWorkout(workout: Workout, user_id: int):
 
         if res is None:
             workout_sql = """ SELECT name FROM exercises """
-            workouts = connection.execute(sqlalchemy.text(workout_sql)).mappings.all()
+            workouts = connection.execute(sqlalchemy.text(workout_sql)).mappings().all()
             print(workouts)
             return [{"Acceptable inputs" : str(workouts)}]
 
