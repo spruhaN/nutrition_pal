@@ -35,22 +35,22 @@ async def postUser(user: User):
 async def updateUser(user_id: int, user: User):
     with db.engine.begin() as connection:
         sql = "SELECT name FROM users WHERE user_id = :user_id"
-        res = connection.execute(sqlalchemy.text(sql), [{"user_id" : user_id}]).fetchone()
+        res = connection.execute(text(sql), {"user_id": user_id}).fetchone()
         if not res:
             raise HTTPException(status_code=422, detail="User does not exist, create an account with /user/")
-    
+        
         if user.weight < 60 or user.height < 40:
             raise HTTPException(status_code=422, detail="Cannot input invalid weight or height")
 
         sql = """
-        update users
-            set
+        UPDATE users
+        SET
             name = :name,
             weight = :weight,
             height = :height
-            where
+        WHERE
             users.user_id = :user_id;
         """
-        result = connection.execute(sqlalchemy.text(sql), user.dict()|{"user_id":user_id}).scalar_one()
+        connection.execute(text(sql), {**user.dict(), "user_id": user_id})
 
     return {"status": "User updated successfully"}
