@@ -119,10 +119,7 @@ async def getWorkoutMuscleGroups(workout_id: int):
         muscle_groups = connection.execute(sqlalchemy.text(sql), {"w_id": workout_id}).mappings().all()
 
         if muscle_groups is None or len(muscle_groups) == 0:
-            sql = """ SELECT muscle_group_id, group_name FROM muscle_groups"""
-            pairings = connection.execute(sqlalchemy.text(sql)).mappings().all()
-            print(pairings)
-            return [{"Acceptable inputs" : str(pairings)}]
+            raise HTTPException(status_code=422, detail="Workout does not exist, find one with /all_workouts/")
 
     return muscle_groups
 
